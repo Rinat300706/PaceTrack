@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import android.util.Log
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +22,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WelcomeMessage() {
-    Text("Welcome to PaceTrack")
+    Column {
+        Text("Welcome to PaceTrack")
+        Text("Track your walks")
+        Text("Track your runs")
+
+
+        Row {
+            Text("Walk ")
+            Text("Run ")
+            Text("Progress ")
+        }
+    }
 }
 
 
