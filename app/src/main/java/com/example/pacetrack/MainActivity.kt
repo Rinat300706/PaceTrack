@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material3.Button
+import androidx.compose.runtime.mutableStateListOf
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +18,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             Column {
                 WelcomeMessage()
-
 
                 Button(onClick = {
                     if(session_button.value == "Start Session")
@@ -28,15 +28,38 @@ class MainActivity : ComponentActivity() {
                     Text(session_button.value)
                 }
 
+                for (i in 0 until display_states.size){
 
+                    val display_name =
+                        if (i == 0) "Time"
+                        else if (i == 1) "Distance"
+                        else "Pace"
 
+                    Button(onClick = {
+                        if(display_states[i] == "off")
+                            display_states[i] = "on"
+                        else
+                            display_states[i] = "off"
+                    }) {
+                        Text(display_name + ": " + display_states[i])
+                    }
+                }
+
+                Button(onClick = {
+                    for(i in 0 until display_states.size){
+                        display_states[i] = "off"
+                    }
+                }) {
+                    Text("Reset Display options")
+                }
 
             }
-            }
+        }
 
         Log.i("PaceTrack", "PaceTrack MainActivity created")
     }
     var session_button = mutableStateOf("Start Session")
+    var display_states = mutableStateListOf("off", "off", "off")
 }
 
 @Composable
