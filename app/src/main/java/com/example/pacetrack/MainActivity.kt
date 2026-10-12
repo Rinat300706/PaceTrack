@@ -10,7 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.Icon
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +58,18 @@ class MainActivity : ComponentActivity() {
                     Text("Reset Display options")
                 }
 
+                Text("New Sessions: ${new_session_count.intValue}")
+
+                FloatingActionButton(onClick = {
+                    new_session_count.intValue++
+                }) {
+                    Icon(
+                        imageVector = add,
+                        contentDescription = "New Session",
+                        tint = Color.White
+                    )
+                }
+
             }
         }
 
@@ -60,6 +77,7 @@ class MainActivity : ComponentActivity() {
     }
     var session_button = mutableStateOf("Start Session")
     var display_states = mutableStateListOf("off", "off", "off")
+    var new_session_count = mutableIntStateOf(0)
 }
 
 @Composable
