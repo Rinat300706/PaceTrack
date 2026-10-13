@@ -22,12 +22,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+
 @Composable
 fun WelcomeMessage() {
     Column {
@@ -67,33 +71,57 @@ fun RadioButtonGroup(
 
 @Composable
 fun SessionControl(session_button: MutableState<String>) {
-    Button(onClick = {
-        if (session_button.value == "Start Session")
-            session_button.value = "Stop Session"
-        else
-            session_button.value = "Start Session"
-    }) {
-        Text(session_button.value)
+
+    Button(
+        onClick = {
+            if (session_button.value == "Start Session")
+                session_button.value = "Stop Session"
+            else
+                session_button.value = "Start Session"
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+    ) {
+        Text(
+            text = session_button.value,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
     }
 }
 
 @Composable
 fun DisplayControls(display_states: MutableList<String>) {
 
-    for (i in 0 until display_states.size) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        for (i in 0 until display_states.size) {
 
-        val display_name =
-            if (i == 0) "Time"
-            else if (i == 1) "Distance"
-            else "Pace"
+            val display_name =
+                if (i == 0) "Time"
+                else if (i == 1) "Distance"
+                else "Pace"
 
-        Button(onClick = {
-            if (display_states[i] == "off")
-                display_states[i] = "on"
-            else
-                display_states[i] = "off"
-        }) {
-            Text(display_name + ": " + display_states[i])
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = display_name,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Button(onClick = {
+                    if (display_states[i] == "off")
+                        display_states[i] = "on"
+                    else
+                        display_states[i] = "off"
+                }) {
+                    Text(display_states[i])
+                }
+            }
         }
     }
 
@@ -102,23 +130,36 @@ fun DisplayControls(display_states: MutableList<String>) {
             display_states[i] = "off"
         }
     }) {
-        Text("Reset Display options")
+        Text("Reset Display Options")
     }
 }
 
 @Composable
 fun NewSessionControl(new_session_count: MutableIntState) {
 
-    Text("New Sessions: ${new_session_count.intValue}")
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = "New Sessions",
+                fontWeight = FontWeight.Bold
+            )
 
-    FloatingActionButton(onClick = {
-        new_session_count.intValue++
-    }) {
-        Icon(
-            imageVector = add,
-            contentDescription = "New Session",
-            tint = Color.White
-        )
+            Text("${new_session_count.intValue} sessions")
+        }
+
+        FloatingActionButton(onClick = {
+            new_session_count.intValue++
+        }) {
+            Icon(
+                imageVector = add,
+                contentDescription = "New Session",
+                tint = Color.White
+            )
+        }
     }
 }
 
@@ -173,12 +214,12 @@ fun DashboardScreen() {
     val goal_distance = remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
+            Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
 
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        Arrangement.spacedBy(12.dp)
     ) {
         WelcomeMessage()
 
