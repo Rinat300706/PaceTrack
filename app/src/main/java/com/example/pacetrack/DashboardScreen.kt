@@ -19,18 +19,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.material3.LinearProgressIndicator
+
+
 @Composable
 fun WelcomeMessage() {
     Column {
-        Text("Welcome to PaceTrack")
-        Text("Track your walks")
-        Text("Track your runs")
+        Text(
+            text = "PaceTrack",
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp
+        )
 
-        Row {
-            Text("Walk ")
-            Text("Run ")
-            Text("Progress ")
-        }
+        Text("Track your walks and runs")
     }
 }
 
@@ -40,78 +52,125 @@ fun RadioButtonGroup(
     selected: Int,
     onStateChanged: (Int) -> Unit
 ) {
-    Column {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
         for (i in 0 until radio_options.size) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 RadioButton(
                     selected = selected == i,
                     onClick = { onStateChanged(i) }
                 )
 
-                Text(
-                    radio_options[i],
-                    Modifier.align(Alignment.CenterVertically)
-                )
+                Text(radio_options[i])
             }
         }
     }
 }
 
-
 @Composable
 fun SessionControl(session_button: MutableState<String>) {
-    Button(onClick = {
-        if (session_button.value == "Start Session")
-            session_button.value = "Stop Session"
-        else
-            session_button.value = "Start Session"
-    }) {
-        Text(session_button.value)
+
+    Button(
+        onClick = {
+            if (session_button.value == "Start Session")
+                session_button.value = "Stop Session"
+            else
+                session_button.value = "Start Session"
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+    ) {
+        Text(
+            text = session_button.value,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
     }
 }
 
 @Composable
 fun DisplayControls(display_states: MutableList<String>) {
 
-    for (i in 0 until display_states.size) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        for (i in 0 until display_states.size) {
 
-        val display_name =
-            if (i == 0) "Time"
-            else if (i == 1) "Distance"
-            else "Pace"
+            val display_name =
+                if (i == 0) "Time"
+                else if (i == 1) "Distance"
+                else "Pace"
 
-        Button(onClick = {
-            if (display_states[i] == "off")
-                display_states[i] = "on"
-            else
-                display_states[i] = "off"
-        }) {
-            Text(display_name + ": " + display_states[i])
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = display_name,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Button(onClick = {
+                    if (display_states[i] == "off")
+                        display_states[i] = "on"
+                    else
+                        display_states[i] = "off"
+                }) {
+                    Text(display_states[i])
+                }
+            }
         }
     }
 
-    Button(onClick = {
-        for (i in 0 until display_states.size) {
-            display_states[i] = "off"
-        }
-    }) {
-        Text("Reset Display options")
+    Button(
+        onClick = {
+            for (i in 0 until display_states.size) {
+                display_states[i] = "off"
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+    ) {
+        Text(
+            text = "Reset Display Options",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
     }
 }
 
 @Composable
 fun NewSessionControl(new_session_count: MutableIntState) {
 
-    Text("New Sessions: ${new_session_count.intValue}")
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = "New Sessions",
+                fontWeight = FontWeight.Bold
+            )
 
-    FloatingActionButton(onClick = {
-        new_session_count.intValue++
-    }) {
-        Icon(
-            imageVector = add,
-            contentDescription = "New Session",
-            tint = Color.White
-        )
+            Text("${new_session_count.intValue} sessions")
+        }
+
+        FloatingActionButton(onClick = {
+            new_session_count.intValue++
+        }) {
+            Icon(
+                imageVector = add,
+                contentDescription = "New Session",
+                tint = Color.White
+            )
+        }
     }
 }
 
@@ -122,16 +181,28 @@ fun GoalControls(
     selected_activity: MutableState<Int>,
     goal_distance: MutableState<String>
 ) {
-    Text("Distance goal enabled: ${goal_enabled.value}")
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Enable distance goal",
+            fontWeight = FontWeight.Bold
+        )
 
-    Checkbox(
-        checked = goal_enabled.value,
-        onCheckedChange = {
-            goal_enabled.value = it
-        }
+        Checkbox(
+            checked = goal_enabled.value,
+            onCheckedChange = {
+                goal_enabled.value = it
+            }
+        )
+    }
+
+    Text(
+        text = "Activity Type",
+        fontWeight = FontWeight.Bold
     )
-
-    Text("Selected activity: ${activity_options[selected_activity.value]}")
 
     RadioButtonGroup(
         activity_options,
@@ -140,13 +211,17 @@ fun GoalControls(
         selected_activity.value = it
     }
 
-    Text("Enter your distance goal (km):")
+    Text(
+        text = "Distance Target (km)",
+        fontWeight = FontWeight.Bold
+    )
 
     TextField(
         value = goal_distance.value,
         onValueChange = {
             goal_distance.value = it
-        }
+        },
+        modifier = Modifier.fillMaxWidth()
     )
 
     Text("Your distance goal is: ${goal_distance.value} km")
@@ -164,9 +239,25 @@ fun DashboardScreen() {
     val activity_options = listOf("Walk", "Run")
     val selected_activity = remember { mutableStateOf(0) }
     val goal_distance = remember { mutableStateOf("") }
+    val demo_progress = remember { mutableIntStateOf(60) }
 
-    Column {
+    Column(
+            Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+
+        Arrangement.spacedBy(12.dp)
+    ) {
         WelcomeMessage()
+
+        HorizontalDivider()
+
+        Text(
+            text = "Session Controls",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
 
         SessionControl(session_button)
 
@@ -174,11 +265,47 @@ fun DashboardScreen() {
 
         NewSessionControl(new_session_count)
 
+        HorizontalDivider()
+
+        Text(
+            text = "Distance Goal",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+
         GoalControls(
             goal_enabled,
             activity_options,
             selected_activity,
             goal_distance
         )
+
+        HorizontalDivider()
+
+        Text(
+            text = "Distance Progress",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+
+        Text("Demo progress: ${demo_progress.intValue}% completed")
+
+        LinearProgressIndicator(
+            progress = { demo_progress.intValue / 100f },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Button(
+            onClick = {
+                if (demo_progress.intValue == 100)
+                    demo_progress.intValue = 0
+                else
+                    demo_progress.intValue += 20
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Test Progress")
+        }
     }
 }
+
