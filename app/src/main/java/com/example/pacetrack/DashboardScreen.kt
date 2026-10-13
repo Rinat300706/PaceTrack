@@ -15,6 +15,10 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 @Composable
 fun WelcomeMessage() {
     Column {
@@ -146,4 +150,35 @@ fun GoalControls(
     )
 
     Text("Your distance goal is: ${goal_distance.value} km")
+}
+
+@Composable
+fun DashboardScreen() {
+
+    val session_button = remember { mutableStateOf("Start Session") }
+    val display_states = remember {
+        mutableStateListOf("off", "off", "off")
+    }
+    val new_session_count = remember { mutableIntStateOf(0) }
+    val goal_enabled = remember { mutableStateOf(false) }
+    val activity_options = listOf("Walk", "Run")
+    val selected_activity = remember { mutableStateOf(0) }
+    val goal_distance = remember { mutableStateOf("") }
+
+    Column {
+        WelcomeMessage()
+
+        SessionControl(session_button)
+
+        DisplayControls(display_states)
+
+        NewSessionControl(new_session_count)
+
+        GoalControls(
+            goal_enabled,
+            activity_options,
+            selected_activity,
+            goal_distance
+        )
+    }
 }
