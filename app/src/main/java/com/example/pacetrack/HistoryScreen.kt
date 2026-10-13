@@ -31,6 +31,12 @@ fun HistoryScreen() {
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
+
+            Text(
+                text = "Your previous activities will appear here.",
+                modifier = Modifier.padding(top = 12.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
