@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.LinearProgressIndicator
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 
 
 @Composable
@@ -240,6 +242,7 @@ fun DashboardScreen() {
     val selected_activity = remember { mutableStateOf(0) }
     val goal_distance = remember { mutableStateOf("") }
     val demo_progress = remember { mutableIntStateOf(60) }
+    val context = LocalContext.current
 
     Column(
             Modifier
@@ -250,6 +253,16 @@ fun DashboardScreen() {
         Arrangement.spacedBy(12.dp)
     ) {
         WelcomeMessage()
+
+        Button(
+            onClick = {
+                val intent = Intent(context, HistoryActivity::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("View History")
+        }
 
         HorizontalDivider()
 
