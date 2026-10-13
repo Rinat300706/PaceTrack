@@ -30,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.LinearProgressIndicator
 
 
 @Composable
@@ -238,6 +239,7 @@ fun DashboardScreen() {
     val activity_options = listOf("Walk", "Run")
     val selected_activity = remember { mutableStateOf(0) }
     val goal_distance = remember { mutableStateOf("") }
+    val demo_progress = remember { mutableIntStateOf(60) }
 
     Column(
             Modifier
@@ -277,6 +279,33 @@ fun DashboardScreen() {
             selected_activity,
             goal_distance
         )
+
+        HorizontalDivider()
+
+        Text(
+            text = "Distance Progress",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+
+        Text("Demo progress: ${demo_progress.intValue}% completed")
+
+        LinearProgressIndicator(
+            progress = { demo_progress.intValue / 100f },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Button(
+            onClick = {
+                if (demo_progress.intValue == 100)
+                    demo_progress.intValue = 0
+                else
+                    demo_progress.intValue += 20
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Test Progress")
+        }
     }
 }
 
