@@ -51,23 +51,24 @@ fun RadioButtonGroup(
     selected: Int,
     onStateChanged: (Int) -> Unit
 ) {
-    Column {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
         for (i in 0 until radio_options.size) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 RadioButton(
                     selected = selected == i,
                     onClick = { onStateChanged(i) }
                 )
 
-                Text(
-                    radio_options[i],
-                    Modifier.align(Alignment.CenterVertically)
-                )
+                Text(radio_options[i])
             }
         }
     }
 }
-
 
 @Composable
 fun SessionControl(session_button: MutableState<String>) {
@@ -125,12 +126,21 @@ fun DisplayControls(display_states: MutableList<String>) {
         }
     }
 
-    Button(onClick = {
-        for (i in 0 until display_states.size) {
-            display_states[i] = "off"
-        }
-    }) {
-        Text("Reset Display Options")
+    Button(
+        onClick = {
+            for (i in 0 until display_states.size) {
+                display_states[i] = "off"
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+    ) {
+        Text(
+            text = "Reset Display Options",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
     }
 }
 
@@ -170,16 +180,28 @@ fun GoalControls(
     selected_activity: MutableState<Int>,
     goal_distance: MutableState<String>
 ) {
-    Text("Distance goal enabled: ${goal_enabled.value}")
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Enable distance goal",
+            fontWeight = FontWeight.Bold
+        )
 
-    Checkbox(
-        checked = goal_enabled.value,
-        onCheckedChange = {
-            goal_enabled.value = it
-        }
+        Checkbox(
+            checked = goal_enabled.value,
+            onCheckedChange = {
+                goal_enabled.value = it
+            }
+        )
+    }
+
+    Text(
+        text = "Activity Type",
+        fontWeight = FontWeight.Bold
     )
-
-    Text("Selected activity: ${activity_options[selected_activity.value]}")
 
     RadioButtonGroup(
         activity_options,
@@ -188,13 +210,17 @@ fun GoalControls(
         selected_activity.value = it
     }
 
-    Text("Enter your distance goal (km):")
+    Text(
+        text = "Distance Target (km)",
+        fontWeight = FontWeight.Bold
+    )
 
     TextField(
         value = goal_distance.value,
         onValueChange = {
             goal_distance.value = it
-        }
+        },
+        modifier = Modifier.fillMaxWidth()
     )
 
     Text("Your distance goal is: ${goal_distance.value} km")
