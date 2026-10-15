@@ -315,29 +315,38 @@ fun DashboardScreen() {
 
         HorizontalDivider()
 
-        Text(
-            text = "Distance Progress",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        Text("Demo progress: ${demo_progress.intValue}% completed")
-
-        LinearProgressIndicator(
-            progress = { demo_progress.intValue / 100f },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Button(
-            onClick = {
-                if (demo_progress.intValue == 100)
-                    demo_progress.intValue = 0
-                else
-                    demo_progress.intValue += 20
-            },
+        Card(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Test Progress")
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Distance Progress",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+
+                Text("Demo progress: ${demo_progress.intValue}% completed")
+
+                LinearProgressIndicator(
+                    progress = { demo_progress.intValue / 100f },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(
+                    onClick = {
+                        if (demo_progress.intValue == 100)
+                            demo_progress.intValue = 0
+                        else
+                            demo_progress.intValue += 20
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Test Progress")
+                }
+            }
         }
     }
 }
