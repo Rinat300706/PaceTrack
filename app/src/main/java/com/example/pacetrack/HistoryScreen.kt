@@ -12,7 +12,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Card
+import androidx.compose.ui.unit.sp
 
+@Composable
+fun HistoryCard(
+    title: String,
+    details: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = title,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Text(
+                text = details,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
 @Composable
 fun HistoryScreen() {
     Surface(
