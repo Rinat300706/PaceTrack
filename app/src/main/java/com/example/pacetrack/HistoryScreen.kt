@@ -68,6 +68,12 @@ fun HistoryScreen() {
                 title = "Sample Walk",
                 details = "Distance: 3 km\nTime: 45 minutes\nPace: 15:00 min/km"
             )
+
+
+            HistoryCard(
+                title = "Sample Run",
+                details = "Distance: 5 km\nTime: 30 minutes\nPace: 6:00 min/km"
+            )
         }
     }
 }
