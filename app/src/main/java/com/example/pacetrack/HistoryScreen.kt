@@ -1,5 +1,7 @@
 package com.example.pacetrack
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,20 +50,23 @@ fun HistoryScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 text = "Activity History",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = 26.sp
             )
 
-            Text(
-                text = "Your previous activities will appear here.",
-                modifier = Modifier.padding(top = 12.dp),
-                style = MaterialTheme.typography.bodyLarge
+            Text("Review your previous walks and runs")
+
+            Text("Example sessions - layout preview")
+
+            HistoryCard(
+                title = "Sample Walk",
+                details = "Distance: 3 km\nTime: 45 minutes\nPace: 15:00 min/km"
             )
         }
     }
