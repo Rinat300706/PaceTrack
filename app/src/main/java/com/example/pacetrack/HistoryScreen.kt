@@ -1,5 +1,6 @@
 package com.example.pacetrack
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,9 +19,25 @@ import androidx.compose.material3.Card
 import androidx.compose.ui.unit.sp
 
 @Composable
+fun HistoryStat(
+    label: String,
+    value: String
+) {
+    Column {
+        Text(
+            text = label,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(text = value)
+    }
+}
+@Composable
 fun HistoryCard(
     title: String,
-    details: String
+    distance: String,     // replaces "details"
+    time: String,
+    pace: String
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -34,10 +51,17 @@ fun HistoryCard(
                 fontSize = 20.sp
             )
 
-            Text(
-                text = details,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+            // replaces the old "details" Text
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                HistoryStat("Distance", distance)
+                HistoryStat("Time", time)
+                HistoryStat("Pace", pace)
+            }
         }
     }
 }
@@ -66,13 +90,16 @@ fun HistoryScreen() {
 
             HistoryCard(
                 title = "Sample Walk",
-                details = "Distance: 3 km\nTime: 45 minutes\nPace: 15:00 min/km"
+                distance = "3 km",
+                time = "45 min",
+                pace = "15:00 /km"
             )
-
 
             HistoryCard(
                 title = "Sample Run",
-                details = "Distance: 5 km\nTime: 30 minutes\nPace: 6:00 min/km"
+                distance = "5 km",
+                time = "30 min",
+                pace = "6:00 /km"
             )
         }
     }
