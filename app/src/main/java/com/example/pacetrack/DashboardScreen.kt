@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material3.LinearProgressIndicator
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.Card
+
 
 
 @Composable
@@ -266,58 +268,85 @@ fun DashboardScreen() {
 
         HorizontalDivider()
 
-        Text(
-            text = "Session Controls",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        SessionControl(session_button)
-
-        DisplayControls(display_states)
-
-        NewSessionControl(new_session_count)
-
-        HorizontalDivider()
-
-        Text(
-            text = "Distance Goal",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        GoalControls(
-            goal_enabled,
-            activity_options,
-            selected_activity,
-            goal_distance
-        )
-
-        HorizontalDivider()
-
-        Text(
-            text = "Distance Progress",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        Text("Demo progress: ${demo_progress.intValue}% completed")
-
-        LinearProgressIndicator(
-            progress = { demo_progress.intValue / 100f },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Button(
-            onClick = {
-                if (demo_progress.intValue == 100)
-                    demo_progress.intValue = 0
-                else
-                    demo_progress.intValue += 20
-            },
+        Card(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Test Progress")
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Session Controls",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+
+                SessionControl(session_button)
+
+                DisplayControls(display_states)
+
+                NewSessionControl(new_session_count)
+            }
+        }
+
+        HorizontalDivider()
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Distance Goal",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+
+                GoalControls(
+                    goal_enabled,
+                    activity_options,
+                    selected_activity,
+                    goal_distance
+                )
+            }
+        }
+
+        HorizontalDivider()
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Distance Progress",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+
+                Text("Demo progress: ${demo_progress.intValue}% completed")
+
+                LinearProgressIndicator(
+                    progress = { demo_progress.intValue / 100f },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(
+                    onClick = {
+                        if (demo_progress.intValue == 100)
+                            demo_progress.intValue = 0
+                        else
+                            demo_progress.intValue += 20
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Test Progress")
+                }
+            }
         }
     }
 }
