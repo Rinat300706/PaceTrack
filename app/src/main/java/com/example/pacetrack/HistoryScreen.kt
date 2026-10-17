@@ -18,6 +18,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Card
 import androidx.compose.ui.unit.sp
 
+data class HistorySession(
+    val title: String,
+    val distance: String,
+    val time: String,
+    val pace: String
+)
 @Composable
 fun HistoryStat(
     label: String,
@@ -35,7 +41,7 @@ fun HistoryStat(
 @Composable
 fun HistoryCard(
     title: String,
-    distance: String,     // replaces "details"
+    distance: String,
     time: String,
     pace: String
 ) {
@@ -51,7 +57,6 @@ fun HistoryCard(
                 fontSize = 20.sp
             )
 
-            // replaces the old "details" Text
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,19 +93,19 @@ fun HistoryScreen() {
 
             Text("Example sessions - layout preview")
 
-            HistoryCard(
-                title = "Sample Walk",
-                distance = "3 km",
-                time = "45 min",
-                pace = "15:00 /km"
+            val sessions = listOf(
+                HistorySession("Sample Walk", "3 km", "45 min", "15:00 /km"),
+                HistorySession("Sample Run", "5 km", "30 min", "6:00 /km")
             )
 
-            HistoryCard(
-                title = "Sample Run",
-                distance = "5 km",
-                time = "30 min",
-                pace = "6:00 /km"
-            )
+            for (session in sessions) {
+                HistoryCard(
+                    title = session.title,
+                    distance = session.distance,
+                    time = session.time,
+                    pace = session.pace
+                )
+            }
         }
     }
 }
