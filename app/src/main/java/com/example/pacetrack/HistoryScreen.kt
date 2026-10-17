@@ -70,6 +70,28 @@ fun HistoryCard(
         }
     }
 }
+
+@Composable
+fun EmptyHistoryMessage() {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "No activities recorded yet",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Text(
+                text = "Complete your first walk or run to see it here.",
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
 @Composable
 fun HistoryScreen() {
     Surface(
@@ -98,13 +120,17 @@ fun HistoryScreen() {
                 HistorySession("Sample Run", "5 km", "30 min", "6:00 /km")
             )
 
-            for (session in sessions) {
-                HistoryCard(
-                    title = session.title,
-                    distance = session.distance,
-                    time = session.time,
-                    pace = session.pace
-                )
+            if (sessions.isEmpty()) {
+                EmptyHistoryMessage()
+            } else {
+                for (session in sessions) {
+                    HistoryCard(
+                        title = session.title,
+                        distance = session.distance,
+                        time = session.time,
+                        pace = session.pace
+                    )
+                }
             }
         }
     }
