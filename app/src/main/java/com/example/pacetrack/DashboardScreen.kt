@@ -245,6 +245,7 @@ fun DashboardScreen() {
     val goal_distance = remember { mutableStateOf("") }
     val demo_progress = remember { mutableIntStateOf(60) }
     val context = LocalContext.current
+    val workoutExpanded = remember { mutableStateOf(false) }
 
     Column(
             Modifier
@@ -266,29 +267,43 @@ fun DashboardScreen() {
             Text("View History")
         }
 
-        HorizontalDivider()
-
-        Card(
+        Button(
+            onClick = {
+                workoutExpanded.value = !workoutExpanded.value
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Text(
+                if (workoutExpanded.value)
+                    "Close Workout Setup"
+                else
+                    "Start Workout"
+            )
+        }
+        if (workoutExpanded.value) {
+            HorizontalDivider()
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "Session Controls",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Session Controls",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
 
-                SessionControl(session_button)
+                    SessionControl(session_button)
 
-                DisplayControls(display_states)
+                    DisplayControls(display_states)
 
-                NewSessionControl(new_session_count)
+                    NewSessionControl(new_session_count)
+                }
             }
         }
-
         HorizontalDivider()
 
         Card(
