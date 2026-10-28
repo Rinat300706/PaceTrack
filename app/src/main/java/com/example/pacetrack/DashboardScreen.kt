@@ -303,31 +303,31 @@ fun DashboardScreen() {
                     NewSessionControl(new_session_count)
                 }
             }
-        }
-        HorizontalDivider()
 
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            HorizontalDivider()
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "Distance Goal",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Distance Goal",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
 
-                GoalControls(
-                    goal_enabled,
-                    activity_options,
-                    selected_activity,
-                    goal_distance
-                )
+                    GoalControls(
+                        goal_enabled,
+                        activity_options,
+                        selected_activity,
+                        goal_distance
+                    )
+                }
             }
         }
-
         HorizontalDivider()
 
         Card(
