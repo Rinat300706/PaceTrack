@@ -271,23 +271,23 @@ fun DashboardScreen() {
         }
 
 
-        Button(
-            onClick = {
-                workoutExpanded.value = !workoutExpanded.value
 
-                if (!workoutExpanded.value) {
-                    workoutActive.value = false
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                if (workoutExpanded.value)
-                    "Close Workout Setup"
-                else
-                    "Start Workout"
-            )
+        if (!workoutActive.value) {
+            Button(
+                onClick = {
+                    workoutExpanded.value = !workoutExpanded.value
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    if (workoutExpanded.value)
+                        "Close Workout Setup"
+                    else
+                        "Start Workout"
+                )
+            }
         }
+
 
 
         AnimatedVisibility(visible = workoutExpanded.value) {
