@@ -34,7 +34,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.Card
-
+import androidx.compose.animation.AnimatedVisibility
 
 
 @Composable
@@ -280,51 +280,56 @@ fun DashboardScreen() {
                     "Start Workout"
             )
         }
-        if (workoutExpanded.value) {
-            HorizontalDivider()
+        AnimatedVisibility(visible = workoutExpanded.value) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            )
+            {
+                HorizontalDivider()
 
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Card(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Session Controls",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Session Controls",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
 
-                    SessionControl(session_button)
+                        SessionControl(session_button)
 
-                    DisplayControls(display_states)
+                        DisplayControls(display_states)
 
-                    NewSessionControl(new_session_count)
+                        NewSessionControl(new_session_count)
+                    }
                 }
-            }
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Card(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Distance Goal",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Distance Goal",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
 
-                    GoalControls(
-                        goal_enabled,
-                        activity_options,
-                        selected_activity,
-                        goal_distance
-                    )
+                        GoalControls(
+                            goal_enabled,
+                            activity_options,
+                            selected_activity,
+                            goal_distance
+                        )
+                    }
                 }
             }
         }
