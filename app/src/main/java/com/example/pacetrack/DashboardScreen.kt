@@ -283,13 +283,39 @@ fun GoalControls(
                         "Start Workout"
                 )
             }
+
             AnimatedVisibility(visible = workoutExpanded.value) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
-                )
-                {
+                ) {
                     HorizontalDivider()
 
+                    // First Card: Workout Setup
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Workout Setup",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
+
+                            GoalControls(
+                                goal_enabled,
+                                activity_options,
+                                selected_activity,
+                                goal_distance
+                            )
+                        }
+                    }
+
+                    HorizontalDivider()
+
+                    // Second Card: Session Controls
                     Card(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -310,8 +336,10 @@ fun GoalControls(
                             NewSessionControl(new_session_count)
                         }
                     }
+                }
+            }
 
-                    HorizontalDivider()
+            HorizontalDivider()
 
                     Card(
                         modifier = Modifier.fillMaxWidth()
@@ -321,57 +349,32 @@ fun GoalControls(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
-                                text = "Distance Goal",
+                                text = "Distance Progress",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp
                             )
 
-                            GoalControls(
-                                goal_enabled,
-                                activity_options,
-                                selected_activity,
-                                goal_distance
+                            Text("Demo progress: ${demo_progress.intValue}% completed")
+
+                            LinearProgressIndicator(
+                                progress = { demo_progress.intValue / 100f },
+                                modifier = Modifier.fillMaxWidth()
                             )
+
+                            Button(
+                                onClick = {
+                                    if (demo_progress.intValue == 100)
+                                        demo_progress.intValue = 0
+                                    else
+                                        demo_progress.intValue += 20
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Test Progress")
+                            }
                         }
                     }
                 }
             }
-            HorizontalDivider()
-
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Distance Progress",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-
-                    Text("Demo progress: ${demo_progress.intValue}% completed")
-
-                    LinearProgressIndicator(
-                        progress = { demo_progress.intValue / 100f },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Button(
-                        onClick = {
-                            if (demo_progress.intValue == 100)
-                                demo_progress.intValue = 0
-                            else
-                                demo_progress.intValue += 20
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Test Progress")
-                    }
-                }
-            }
-        }
-    }
 
 
