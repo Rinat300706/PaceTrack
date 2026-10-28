@@ -31,7 +31,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.LinearProgressIndicator
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.Card
@@ -247,7 +246,6 @@ fun DashboardScreen() {
     val activity_options = listOf("Walk", "Run")
     val selected_activity = remember { mutableStateOf(0) }
     val goal_distance = remember { mutableStateOf("") }
-    val demo_progress = remember { mutableIntStateOf(60) }
     val context = LocalContext.current
     val workoutExpanded = remember { mutableStateOf(false) }
     val workoutActive = remember { mutableStateOf(false) }
@@ -416,41 +414,6 @@ fun DashboardScreen() {
             }
         }
 
-        HorizontalDivider()
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Distance Progress",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-
-                Text("Demo progress: ${demo_progress.intValue}% completed")
-
-                LinearProgressIndicator(
-                    progress = { demo_progress.intValue / 100f },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Button(
-                    onClick = {
-                        if (demo_progress.intValue == 100)
-                            demo_progress.intValue = 0
-                        else
-                            demo_progress.intValue += 20
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Test Progress")
-                }
-            }
-        }
     }
 }
 
