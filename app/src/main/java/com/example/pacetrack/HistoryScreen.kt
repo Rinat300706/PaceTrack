@@ -17,7 +17,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Card
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
 
+data class HistorySession(
+    val title: String,
+    val type: String,
+    val distance: String,
+    val time: String,
+    val pace: String
+)
 @Composable
 fun HistoryStat(
     label: String,
@@ -35,7 +44,7 @@ fun HistoryStat(
 @Composable
 fun HistoryCard(
     title: String,
-    distance: String,     // replaces "details"
+    distance: String,
     time: String,
     pace: String
 ) {
@@ -51,7 +60,6 @@ fun HistoryCard(
                 fontSize = 20.sp
             )
 
-            // replaces the old "details" Text
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -62,6 +70,28 @@ fun HistoryCard(
                 HistoryStat("Time", time)
                 HistoryStat("Pace", pace)
             }
+        }
+    }
+}
+
+@Composable
+fun EmptyHistoryMessage() {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "No activities recorded yet",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Text(
+                text = "Complete your first walk or run to see it here.",
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
@@ -88,19 +118,35 @@ fun HistoryScreen() {
 
             Text("Example sessions - layout preview")
 
-            HistoryCard(
-                title = "Sample Walk",
-                distance = "3 km",
-                time = "45 min",
-                pace = "15:00 /km"
+            val sessions = listOf(
+                HistorySession("Sample Walk", "Walk", "3 km", "45 min", "15:00 /km"),
+                HistorySession("Sample Run", "Run", "5 km", "30 min", "6:00 /km"),
+                HistorySession("Evening Walk", "Walk", "2 km", "28 min", "14:00 /km")
             )
 
-            HistoryCard(
-                title = "Sample Run",
-                distance = "5 km",
-                time = "30 min",
-                pace = "6:00 /km"
-            )
+            val filter_options = listOf("All", "Walk", "Run")
+            val selected_filter = remember { mutableIntStateOf(0) }
+
+            RadioButtonGroup(filter_options, selected_filter.intValue) {
+                selected_filter.intValue = it
+            }
+
+            val shown_sessions =
+                if (selected_filter.intValue == 0) sessions
+                else sessions.filter { it.type == filter_options[selected_filter.intValue] }
+
+            if (shown_sessions.isEmpty()) {
+                EmptyHistoryMessage()
+            } else {
+                for (session in shown_sessions) {
+                    HistoryCard(
+                        title = session.title,
+                        distance = session.distance,
+                        time = session.time,
+                        pace = session.pace
+                    )
+                }
+            }
         }
     }
 }
