@@ -385,6 +385,19 @@ fun DashboardScreen() {
                                 }
                             }
 
+
+                            if (goal_enabled.value && goal_distance.value.isNotBlank()) {
+                                HorizontalDivider()
+
+                                Text(
+                                    text = "Distance Goal",
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                Text("${goal_distance.value} km")
+                            }
+
+
                             Text("Preview only: Timer and GPS tracking are not connected yet.")
 
 
