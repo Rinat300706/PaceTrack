@@ -345,9 +345,50 @@ fun DashboardScreen() {
 
                         if (workoutActive.value) {
 
-                            Text("Activity: ${activity_options[selected_activity.value]}")
 
-                            Text("Timer and GPS tracking are not connected yet.")
+                            Text(
+                                text = "${activity_options[selected_activity.value]} Session",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
+
+                            HorizontalDivider()
+
+                            Text("Elapsed Time")
+
+                            Text(
+                                text = "--:--:--",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 32.sp
+                            )
+
+                            HorizontalDivider()
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text("Distance")
+                                    Text(
+                                        text = "-- km",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp
+                                    )
+                                }
+
+                                Column {
+                                    Text("Average Pace")
+                                    Text(
+                                        text = "-- /km",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp
+                                    )
+                                }
+                            }
+
+                            Text("Preview only: Timer and GPS tracking are not connected yet.")
+
 
                             Button(
                                 onClick = {
