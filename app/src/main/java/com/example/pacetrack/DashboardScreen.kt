@@ -250,6 +250,12 @@ fun DashboardScreen() {
     val workoutExpanded = remember { mutableStateOf(false) }
     val workoutActive = remember { mutableStateOf(false) }
 
+    val validGoal = !goal_enabled.value ||
+            (goal_distance.value.matches(Regex("[0-9]+(\\.[0-9]+)?")) &&
+                    goal_distance.value.toDoubleOrNull()?.let {
+                        it > 0 && it.isFinite()
+                    } == true)
+
     Column(
         Modifier
             .fillMaxSize()
@@ -412,14 +418,21 @@ fun DashboardScreen() {
 
                         } else {
 
+
+                            if (!validGoal) {
+                                Text("Enter a valid distance greater than 0 km.")
+                            }
+
                             Button(
                                 onClick = {
                                     workoutActive.value = true
                                 },
+                                enabled = validGoal,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text("Begin ${activity_options[selected_activity.value]}")
                             }
+
                         }
 
                     }
