@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Card
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
 
 data class HistorySession(
     val title: String,
@@ -122,10 +124,21 @@ fun HistoryScreen() {
                 HistorySession("Evening Walk", "Walk", "2 km", "28 min", "14:00 /km")
             )
 
-            if (sessions.isEmpty()) {
+            val filter_options = listOf("All", "Walk", "Run")
+            val selected_filter = remember { mutableIntStateOf(0) }
+
+            RadioButtonGroup(filter_options, selected_filter.intValue) {
+                selected_filter.intValue = it
+            }
+
+            val shown_sessions =
+                if (selected_filter.intValue == 0) sessions
+                else sessions.filter { it.type == filter_options[selected_filter.intValue] }
+
+            if (shown_sessions.isEmpty()) {
                 EmptyHistoryMessage()
             } else {
-                for (session in sessions) {
+                for (session in shown_sessions) {
                     HistoryCard(
                         title = session.title,
                         distance = session.distance,
