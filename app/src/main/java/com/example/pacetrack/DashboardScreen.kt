@@ -215,159 +215,163 @@ fun GoalControls(
         selected_activity.value = it
     }
 
-    Text(
-        text = "Distance Target (km)",
-        fontWeight = FontWeight.Bold
-    )
+    if (goal_enabled.value) {
 
-    TextField(
-        value = goal_distance.value,
-        onValueChange = {
-            goal_distance.value = it
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
+        Text(
+            text = "Distance Target (km)",
+            fontWeight = FontWeight.Bold
+        )
 
-    Text("Your distance goal is: ${goal_distance.value} km")
+        TextField(
+            value = goal_distance.value,
+            onValueChange = {
+                goal_distance.value = it
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Text("Your distance goal is: ${goal_distance.value} km")
+    }
 }
 
-@Composable
-fun DashboardScreen() {
+    @Composable
+    fun DashboardScreen() {
 
-    val session_button = remember { mutableStateOf("Start Session") }
-    val display_states = remember {
-        mutableStateListOf("off", "off", "off")
-    }
-    val new_session_count = remember { mutableIntStateOf(0) }
-    val goal_enabled = remember { mutableStateOf(false) }
-    val activity_options = listOf("Walk", "Run")
-    val selected_activity = remember { mutableStateOf(0) }
-    val goal_distance = remember { mutableStateOf("") }
-    val demo_progress = remember { mutableIntStateOf(60) }
-    val context = LocalContext.current
-    val workoutExpanded = remember { mutableStateOf(false) }
+        val session_button = remember { mutableStateOf("Start Session") }
+        val display_states = remember {
+            mutableStateListOf("off", "off", "off")
+        }
+        val new_session_count = remember { mutableIntStateOf(0) }
+        val goal_enabled = remember { mutableStateOf(false) }
+        val activity_options = listOf("Walk", "Run")
+        val selected_activity = remember { mutableStateOf(0) }
+        val goal_distance = remember { mutableStateOf("") }
+        val demo_progress = remember { mutableIntStateOf(60) }
+        val context = LocalContext.current
+        val workoutExpanded = remember { mutableStateOf(false) }
 
-    Column(
+        Column(
             Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
 
-        Arrangement.spacedBy(12.dp)
-    ) {
-        WelcomeMessage()
-
-        Button(
-            onClick = {
-                val intent = Intent(context, HistoryActivity::class.java)
-                context.startActivity(intent)
-            },
-            modifier = Modifier.fillMaxWidth()
+            Arrangement.spacedBy(12.dp)
         ) {
-            Text("View History")
-        }
+            WelcomeMessage()
 
-        Button(
-            onClick = {
-                workoutExpanded.value = !workoutExpanded.value
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                if (workoutExpanded.value)
-                    "Close Workout Setup"
-                else
-                    "Start Workout"
-            )
-        }
-        AnimatedVisibility(visible = workoutExpanded.value) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            )
-            {
-                HorizontalDivider()
-
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "Session Controls",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
-
-                        SessionControl(session_button)
-
-                        DisplayControls(display_states)
-
-                        NewSessionControl(new_session_count)
-                    }
-                }
-
-                HorizontalDivider()
-
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "Distance Goal",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
-
-                        GoalControls(
-                            goal_enabled,
-                            activity_options,
-                            selected_activity,
-                            goal_distance
-                        )
-                    }
-                }
+            Button(
+                onClick = {
+                    val intent = Intent(context, HistoryActivity::class.java)
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("View History")
             }
-        }
-        HorizontalDivider()
 
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Button(
+                onClick = {
+                    workoutExpanded.value = !workoutExpanded.value
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Distance Progress",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    if (workoutExpanded.value)
+                        "Close Workout Setup"
+                    else
+                        "Start Workout"
                 )
-
-                Text("Demo progress: ${demo_progress.intValue}% completed")
-
-                LinearProgressIndicator(
-                    progress = { demo_progress.intValue / 100f },
-                    modifier = Modifier.fillMaxWidth()
+            }
+            AnimatedVisibility(visible = workoutExpanded.value) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 )
+                {
+                    HorizontalDivider()
 
-                Button(
-                    onClick = {
-                        if (demo_progress.intValue == 100)
-                            demo_progress.intValue = 0
-                        else
-                            demo_progress.intValue += 20
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Session Controls",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
+
+                            SessionControl(session_button)
+
+                            DisplayControls(display_states)
+
+                            NewSessionControl(new_session_count)
+                        }
+                    }
+
+                    HorizontalDivider()
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Distance Goal",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
+
+                            GoalControls(
+                                goal_enabled,
+                                activity_options,
+                                selected_activity,
+                                goal_distance
+                            )
+                        }
+                    }
+                }
+            }
+            HorizontalDivider()
+
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Test Progress")
+                    Text(
+                        text = "Distance Progress",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+
+                    Text("Demo progress: ${demo_progress.intValue}% completed")
+
+                    LinearProgressIndicator(
+                        progress = { demo_progress.intValue / 100f },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Button(
+                        onClick = {
+                            if (demo_progress.intValue == 100)
+                                demo_progress.intValue = 0
+                            else
+                                demo_progress.intValue += 20
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Test Progress")
+                    }
                 }
             }
         }
     }
-}
+
 
