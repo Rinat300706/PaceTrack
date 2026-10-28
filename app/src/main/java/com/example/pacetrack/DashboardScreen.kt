@@ -299,25 +299,27 @@ fun DashboardScreen() {
                 HorizontalDivider()
 
                 // First Card: Workout Setup
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                if (!workoutActive.value) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Workout Setup",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Workout Setup",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
 
-                        GoalControls(
-                            goal_enabled,
-                            activity_options,
-                            selected_activity,
-                            goal_distance
-                        )
+                            GoalControls(
+                                goal_enabled,
+                                activity_options,
+                                selected_activity,
+                                goal_distance
+                            )
+                        }
                     }
                 }
 
