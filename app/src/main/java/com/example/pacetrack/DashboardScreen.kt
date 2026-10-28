@@ -1,5 +1,6 @@
 package com.example.pacetrack
 
+import android.R.attr.onClick
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -234,147 +235,180 @@ fun GoalControls(
     }
 }
 
-    @Composable
-    fun DashboardScreen() {
+@Composable
+fun DashboardScreen() {
 
-        val session_button = remember { mutableStateOf("Start Session") }
-        val display_states = remember {
-            mutableStateListOf("off", "off", "off")
-        }
-        val new_session_count = remember { mutableIntStateOf(0) }
-        val goal_enabled = remember { mutableStateOf(false) }
-        val activity_options = listOf("Walk", "Run")
-        val selected_activity = remember { mutableStateOf(0) }
-        val goal_distance = remember { mutableStateOf("") }
-        val demo_progress = remember { mutableIntStateOf(60) }
-        val context = LocalContext.current
-        val workoutExpanded = remember { mutableStateOf(false) }
+    val session_button = remember { mutableStateOf("Start Session") }
+    val display_states = remember {
+        mutableStateListOf("off", "off", "off")
+    }
+    val new_session_count = remember { mutableIntStateOf(0) }
+    val goal_enabled = remember { mutableStateOf(false) }
+    val activity_options = listOf("Walk", "Run")
+    val selected_activity = remember { mutableStateOf(0) }
+    val goal_distance = remember { mutableStateOf("") }
+    val demo_progress = remember { mutableIntStateOf(60) }
+    val context = LocalContext.current
+    val workoutExpanded = remember { mutableStateOf(false) }
+    val workoutActive = remember { mutableStateOf(false) }
 
-        Column(
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
 
-            Arrangement.spacedBy(12.dp)
+        Arrangement.spacedBy(12.dp)
+    ) {
+        WelcomeMessage()
+
+        Button(
+            onClick = {
+                val intent = Intent(context, HistoryActivity::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            WelcomeMessage()
+            Text("View History")
+        }
 
-            Button(
-                onClick = {
-                    val intent = Intent(context, HistoryActivity::class.java)
-                    context.startActivity(intent)
-                },
-                modifier = Modifier.fillMaxWidth()
+
+        Button(
+            onClick = {
+                workoutExpanded.value = !workoutExpanded.value
+
+                if (!workoutExpanded.value) {
+                    workoutActive.value = false
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                if (workoutExpanded.value)
+                    "Close Workout Setup"
+                else
+                    "Start Workout"
+            )
+        }
+
+
+        AnimatedVisibility(visible = workoutExpanded.value) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("View History")
-            }
+                HorizontalDivider()
 
-            Button(
-                onClick = {
-                    workoutExpanded.value = !workoutExpanded.value
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    if (workoutExpanded.value)
-                        "Close Workout Setup"
-                    else
-                        "Start Workout"
-                )
-            }
-
-            AnimatedVisibility(visible = workoutExpanded.value) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                // First Card: Workout Setup
+                Card(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    HorizontalDivider()
-
-                    // First Card: Workout Setup
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                text = "Workout Setup",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
-                            )
+                        Text(
+                            text = "Workout Setup",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
 
-                            GoalControls(
-                                goal_enabled,
-                                activity_options,
-                                selected_activity,
-                                goal_distance
-                            )
-                        }
-                    }
-
-                    HorizontalDivider()
-
-                    // Second Card: Session Controls
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                text = "Session Controls",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
-                            )
-
-                            SessionControl(session_button)
-
-                            DisplayControls(display_states)
-
-                            NewSessionControl(new_session_count)
-                        }
+                        GoalControls(
+                            goal_enabled,
+                            activity_options,
+                            selected_activity,
+                            goal_distance
+                        )
                     }
                 }
-            }
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
+                // Second Card: Session Controls
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                text = "Distance Progress",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
-                            )
 
-                            Text("Demo progress: ${demo_progress.intValue}% completed")
+                        Text(
+                            text = if (workoutActive.value)
+                                "Workout Preview"
+                            else
+                                "Ready to Begin",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
 
-                            LinearProgressIndicator(
-                                progress = { demo_progress.intValue / 100f },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                        if (workoutActive.value) {
+
+                            Text("Activity: ${activity_options[selected_activity.value]}")
+
+                            Text("Timer and GPS tracking are not connected yet.")
 
                             Button(
                                 onClick = {
-                                    if (demo_progress.intValue == 100)
-                                        demo_progress.intValue = 0
-                                    else
-                                        demo_progress.intValue += 20
+                                    workoutActive.value = false
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Test Progress")
+                                Text("End Preview")
+                            }
+
+                        } else {
+
+                            Button(
+                                onClick = {
+                                    workoutActive.value = true
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Begin ${activity_options[selected_activity.value]}")
                             }
                         }
+
                     }
                 }
             }
+        }
+
+        HorizontalDivider()
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Distance Progress",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+
+                Text("Demo progress: ${demo_progress.intValue}% completed")
+
+                LinearProgressIndicator(
+                    progress = { demo_progress.intValue / 100f },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(
+                    onClick = {
+                        if (demo_progress.intValue == 100)
+                            demo_progress.intValue = 0
+                        else
+                            demo_progress.intValue += 20
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Test Progress")
+                }
+            }
+        }
+    }
+}
 
 
