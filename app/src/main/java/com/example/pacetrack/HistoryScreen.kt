@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 
 data class HistorySession(
     val title: String,
+    val type: String,
     val distance: String,
     val time: String,
     val pace: String
@@ -116,8 +117,9 @@ fun HistoryScreen() {
             Text("Example sessions - layout preview")
 
             val sessions = listOf(
-                HistorySession("Sample Walk", "3 km", "45 min", "15:00 /km"),
-                HistorySession("Sample Run", "5 km", "30 min", "6:00 /km")
+                HistorySession("Sample Walk", "Walk", "3 km", "45 min", "15:00 /km"),
+                HistorySession("Sample Run", "Run", "5 km", "30 min", "6:00 /km"),
+                HistorySession("Evening Walk", "Walk", "2 km", "28 min", "14:00 /km")
             )
 
             if (sessions.isEmpty()) {
