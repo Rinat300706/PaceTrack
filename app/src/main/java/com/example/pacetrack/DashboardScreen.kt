@@ -39,6 +39,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
+import android.app.ActivityOptions
 
 
 @Composable
@@ -201,7 +202,14 @@ fun DashboardScreen() {
                                 context,
                                 HistoryActivity::class.java
                             )
-                            context.startActivity(intent)
+
+                            val options = ActivityOptions.makeCustomAnimation(
+                                context,
+                                R.anim.slide_in_up,
+                                0
+                            )
+
+                            context.startActivity(intent, options.toBundle())
                         },
                         modifier = Modifier
                             .fillMaxWidth()
