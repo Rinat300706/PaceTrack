@@ -37,6 +37,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 
 @Composable
@@ -89,7 +91,7 @@ fun GoalControls(
 ) {
 
     Text(
-        text = "Activity Type",
+        text = "Choose your activity",
         fontWeight = FontWeight.Bold
     )
 
@@ -130,6 +132,9 @@ fun GoalControls(
             onValueChange = {
                 goal_distance.value = it
             },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal
+            ),
             modifier = Modifier.fillMaxWidth()
         )
 
