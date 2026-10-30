@@ -1,5 +1,6 @@
 package com.example.pacetrack
 
+import android.R.attr.onClick
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,15 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Button
 import androidx.compose.runtime.MutableState
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.foundation.layout.Arrangement
@@ -30,20 +26,32 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.LinearProgressIndicator
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.Card
-
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import android.app.ActivityOptions
 
 
 @Composable
 fun WelcomeMessage() {
-    Column {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = "PaceTrack",
             fontWeight = FontWeight.Bold,
-            fontSize = 26.sp
+            fontSize = 30.sp
         )
 
         Text("Track your walks and runs")
@@ -76,115 +84,25 @@ fun RadioButtonGroup(
 }
 
 @Composable
-fun SessionControl(session_button: MutableState<String>) {
-
-    Button(
-        onClick = {
-            if (session_button.value == "Start Session")
-                session_button.value = "Stop Session"
-            else
-                session_button.value = "Start Session"
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-    ) {
-        Text(
-            text = session_button.value,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
-        )
-    }
-}
-
-@Composable
-fun DisplayControls(display_states: MutableList<String>) {
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        for (i in 0 until display_states.size) {
-
-            val display_name =
-                if (i == 0) "Time"
-                else if (i == 1) "Distance"
-                else "Pace"
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = display_name,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Button(onClick = {
-                    if (display_states[i] == "off")
-                        display_states[i] = "on"
-                    else
-                        display_states[i] = "off"
-                }) {
-                    Text(display_states[i])
-                }
-            }
-        }
-    }
-
-    Button(
-        onClick = {
-            for (i in 0 until display_states.size) {
-                display_states[i] = "off"
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-    ) {
-        Text(
-            text = "Reset Display Options",
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
-        )
-    }
-}
-
-@Composable
-fun NewSessionControl(new_session_count: MutableIntState) {
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column {
-            Text(
-                text = "New Sessions",
-                fontWeight = FontWeight.Bold
-            )
-
-            Text("${new_session_count.intValue} sessions")
-        }
-
-        FloatingActionButton(onClick = {
-            new_session_count.intValue++
-        }) {
-            Icon(
-                imageVector = add,
-                contentDescription = "New Session",
-                tint = Color.White
-            )
-        }
-    }
-}
-
-@Composable
 fun GoalControls(
     goal_enabled: MutableState<Boolean>,
     activity_options: List<String>,
     selected_activity: MutableState<Int>,
     goal_distance: MutableState<String>
 ) {
+
+    Text(
+        text = "Choose your activity",
+        fontWeight = FontWeight.Bold
+    )
+
+    RadioButtonGroup(
+        activity_options,
+        selected_activity.value
+    ) {
+        selected_activity.value = it
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -203,151 +121,321 @@ fun GoalControls(
         )
     }
 
-    Text(
-        text = "Activity Type",
-        fontWeight = FontWeight.Bold
-    )
+    if (goal_enabled.value) {
 
-    RadioButtonGroup(
-        activity_options,
-        selected_activity.value
-    ) {
-        selected_activity.value = it
+        Text(
+            text = "Distance Target (km)",
+            fontWeight = FontWeight.Bold
+        )
+
+        TextField(
+            value = goal_distance.value,
+            onValueChange = {
+                goal_distance.value = it
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Text("Your distance goal is: ${goal_distance.value} km")
     }
-
-    Text(
-        text = "Distance Target (km)",
-        fontWeight = FontWeight.Bold
-    )
-
-    TextField(
-        value = goal_distance.value,
-        onValueChange = {
-            goal_distance.value = it
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
-
-    Text("Your distance goal is: ${goal_distance.value} km")
 }
+
 
 @Composable
 fun DashboardScreen() {
 
-    val session_button = remember { mutableStateOf("Start Session") }
-    val display_states = remember {
-        mutableStateListOf("off", "off", "off")
-    }
-    val new_session_count = remember { mutableIntStateOf(0) }
+    val context = LocalContext.current
+
+    // 0 = Home
+    // 1 = Workout Setup
+    // 2 = Active Workout
+    // 3 = Workout Completed
+    val workoutStage = remember { mutableIntStateOf(0) }
+
     val goal_enabled = remember { mutableStateOf(false) }
     val activity_options = listOf("Walk", "Run")
     val selected_activity = remember { mutableStateOf(0) }
     val goal_distance = remember { mutableStateOf("") }
-    val demo_progress = remember { mutableIntStateOf(60) }
-    val context = LocalContext.current
 
-    Column(
-            Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+    val validGoal = !goal_enabled.value ||
+            (goal_distance.value.matches(Regex("[0-9]+(\\.[0-9]+)?")) &&
+                    goal_distance.value.toDoubleOrNull()?.let {
+                        it > 0 && it.isFinite()
+                    } == true)
 
-        Arrangement.spacedBy(12.dp)
-    ) {
-        WelcomeMessage()
-
-        Button(
-            onClick = {
-                val intent = Intent(context, HistoryActivity::class.java)
-                context.startActivity(intent)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("View History")
-        }
-
-        HorizontalDivider()
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Session Controls",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-
-                SessionControl(session_button)
-
-                DisplayControls(display_states)
-
-                NewSessionControl(new_session_count)
+    AnimatedContent(
+        targetState = workoutStage.intValue,
+        modifier = Modifier.fillMaxSize(),
+        label = "Workout screen transition",
+        transitionSpec = {
+            if (targetState > initialState) {
+                (slideInVertically { height -> height } + fadeIn()) togetherWith
+                        (slideOutVertically { height -> -height } + fadeOut())
+            } else {
+                (slideInVertically { height -> -height } + fadeIn()) togetherWith
+                        (slideOutVertically { height -> height } + fadeOut())
             }
         }
+    ) { stage ->
 
-        HorizontalDivider()
+        when (stage) {
 
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Distance Goal",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-
-                GoalControls(
-                    goal_enabled,
-                    activity_options,
-                    selected_activity,
-                    goal_distance
-                )
-            }
-        }
-
-        HorizontalDivider()
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Distance Progress",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-
-                Text("Demo progress: ${demo_progress.intValue}% completed")
-
-                LinearProgressIndicator(
-                    progress = { demo_progress.intValue / 100f },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Button(
-                    onClick = {
-                        if (demo_progress.intValue == 100)
-                            demo_progress.intValue = 0
-                        else
-                            demo_progress.intValue += 20
-                    },
-                    modifier = Modifier.fillMaxWidth()
+            // SCREEN 1: Home
+            0 -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp)
                 ) {
-                    Text("Test Progress")
+                    Spacer(modifier = Modifier.height(80.dp))
+
+                    WelcomeMessage()
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    OutlinedButton(
+                        onClick = {
+                            val intent = Intent(
+                                context,
+                                HistoryActivity::class.java
+                            )
+
+                            val options = ActivityOptions.makeCustomAnimation(
+                                context,
+                                R.anim.slide_in_up,
+                                0
+                            )
+
+                            context.startActivity(intent, options.toBundle())
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text("View History")
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {
+                            workoutStage.intValue = 1
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text("Start Workout")
+                    }
+                }
+            }
+
+            // SCREEN 2: Workout setup
+            1 -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    Text(
+                        text = "Workout Setup",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 26.sp
+                    )
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            GoalControls(
+                                goal_enabled,
+                                activity_options,
+                                selected_activity,
+                                goal_distance
+                            )
+                        }
+                    }
+
+                    if (!validGoal) {
+                        Text("Enter a valid distance greater than 0 km.")
+                    }
+
+                    Button(
+                        onClick = {
+                            workoutStage.intValue = 2
+                        },
+                        enabled = validGoal,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text("Begin ${activity_options[selected_activity.value]}")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            workoutStage.intValue = 0
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Back to Home")
+                    }
+                }
+            }
+
+            // SCREEN 3: Active workout
+            2 -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    Text(
+                        text = "${activity_options[selected_activity.value]} Session",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 26.sp
+                    )
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+
+                            Text("Elapsed Time")
+
+                            Text(
+                                text = "--:--:--",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 32.sp
+                            )
+
+                            HorizontalDivider()
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text("Distance")
+                                    Text(
+                                        "-- km",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp
+                                    )
+                                }
+
+                                Column {
+                                    Text("Average Pace")
+                                    Text(
+                                        "-- /km",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp
+                                    )
+                                }
+                            }
+
+                            if (goal_enabled.value && validGoal) {
+                                HorizontalDivider()
+                                Text("Distance Goal")
+                                Text("${goal_distance.value} km")
+                            }
+                        }
+                    }
+
+                    Text("Preview only: Real timer and GPS tracking are not connected yet.")
+
+                    Button(
+                        onClick = {
+                            workoutStage.intValue = 3
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text("Finish Preview")
+                    }
+                }
+            }
+
+            // SCREEN 4: Workout completed
+            3 -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    Text(
+                        text = "Workout Preview Finished",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 26.sp
+                    )
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+
+                            Text("Activity: ${activity_options[selected_activity.value]}")
+
+                            Text("Elapsed Time: --:--:--")
+
+                            Text("Distance: -- km")
+
+                            Text("Average Pace: -- /km")
+
+                            if (goal_enabled.value && validGoal) {
+                                Text("Distance Goal: ${goal_distance.value} km")
+                            }
+                        }
+                    }
+
+                    Text(
+                        "This was an interface preview. No workout has been recorded or saved."
+                    )
+
+                    Button(
+                        onClick = {
+                            workoutStage.intValue = 1
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("New Workout")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            workoutStage.intValue = 0
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Back to Home")
+                    }
                 }
             }
         }
     }
 }
+
+
 
