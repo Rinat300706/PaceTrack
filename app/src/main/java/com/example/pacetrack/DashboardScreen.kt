@@ -87,6 +87,19 @@ fun GoalControls(
     selected_activity: MutableState<Int>,
     goal_distance: MutableState<String>
 ) {
+
+    Text(
+        text = "Activity Type",
+        fontWeight = FontWeight.Bold
+    )
+
+    RadioButtonGroup(
+        activity_options,
+        selected_activity.value
+    ) {
+        selected_activity.value = it
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -103,18 +116,6 @@ fun GoalControls(
                 goal_enabled.value = it
             }
         )
-    }
-
-    Text(
-        text = "Activity Type",
-        fontWeight = FontWeight.Bold
-    )
-
-    RadioButtonGroup(
-        activity_options,
-        selected_activity.value
-    ) {
-        selected_activity.value = it
     }
 
     if (goal_enabled.value) {
