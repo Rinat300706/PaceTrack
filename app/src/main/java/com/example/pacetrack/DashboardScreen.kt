@@ -35,15 +35,20 @@ import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.Card
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material3.OutlinedButton
 
 
 @Composable
 fun WelcomeMessage() {
-    Column {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = "PaceTrack",
             fontWeight = FontWeight.Bold,
-            fontSize = 26.sp
+            fontSize = 30.sp
         )
 
         Text("Track your walks and runs")
@@ -255,6 +260,50 @@ fun DashboardScreen() {
                     goal_distance.value.toDoubleOrNull()?.let {
                         it > 0 && it.isFinite()
                     } == true)
+
+    if (!workoutExpanded.value) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
+
+            Spacer(modifier = Modifier.height(80.dp))
+
+            WelcomeMessage()
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            OutlinedButton(
+                onClick = {
+                    val intent = Intent(context, HistoryActivity::class.java)
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text("View History")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = {
+                    workoutExpanded.value = true
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text("Start Workout")
+            }
+        }
+
+        return
+    }
+
 
     Column(
         Modifier
