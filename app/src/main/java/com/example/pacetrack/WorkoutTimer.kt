@@ -23,5 +23,22 @@ class WorkoutTimer {
         running = true
         started = true
     }
+
+
+    // Pauses the workout timer without losing elapsed time.
+    fun pause() {
+
+        // Only pause if the timer is currently running.
+        if (running) {
+
+            // Add the time since the timer was last started.
+            accumulatedTime +=
+                SystemClock.elapsedRealtime() - startedAt
+
+            // Mark the timer as paused.
+            running = false
+        }
+    }
+
 }
 
