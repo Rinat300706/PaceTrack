@@ -40,6 +40,13 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import android.app.ActivityOptions
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.provider.Settings
+import android.net.Uri
 
 
 @Composable
@@ -149,11 +156,48 @@ fun DashboardScreen() {
 
     val context = LocalContext.current
 
+    val workoutStage = remember { mutableIntStateOf(0) }
+
+    // Message shown if location permission is not granted.
+    val locationPermissionMessage = remember {
+        mutableStateOf<String?>(null)
+    }
+
+    // Requests location permissions from Android.
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+
+        val preciseGranted =
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+
+        val approximateGranted =
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+
+        when {
+            preciseGranted -> {
+                locationPermissionMessage.value = null
+                workoutStage.intValue = 2
+            }
+
+            approximateGranted -> {
+                locationPermissionMessage.value =
+                    "Precise location is needed for accurate workout distance. " +
+                            "Enable precise location for PaceTrack in your phone settings."
+            }
+
+            else -> {
+                locationPermissionMessage.value =
+                    "Location permission is required to track your workout distance."
+            }
+        }
+    }
+
+
     // 0 = Home
     // 1 = Workout Setup
     // 2 = Active Workout
     // 3 = Workout Completed
-    val workoutStage = remember { mutableIntStateOf(0) }
 
     val goal_enabled = remember { mutableStateOf(false) }
     val activity_options = listOf("Walk", "Run")
@@ -270,9 +314,27 @@ fun DashboardScreen() {
                     }
 
                     Button(
+
                         onClick = {
-                            workoutStage.intValue = 2
+                            val hasPreciseLocation =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                                ) == PackageManager.PERMISSION_GRANTED
+
+                            if (hasPreciseLocation) {
+                                locationPermissionMessage.value = null
+                                workoutStage.intValue = 2
+                            } else {
+                                locationPermissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                )
+                            }
                         },
+
                         enabled = validGoal,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -280,6 +342,34 @@ fun DashboardScreen() {
                     ) {
                         Text("Begin ${activity_options[selected_activity.value]}")
                     }
+
+
+                    if (locationPermissionMessage.value != null) {
+
+                        Text(
+                            text = locationPermissionMessage.value ?: ""
+                        )
+
+                        OutlinedButton(
+                            onClick = {
+                                val intent = Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                ).apply {
+                                    data = Uri.fromParts(
+                                        "package",
+                                        context.packageName,
+                                        null
+                                    )
+                                }
+
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Open Location Settings")
+                        }
+                    }
+
 
                     OutlinedButton(
                         onClick = {
