@@ -25,19 +25,27 @@ class LocationTracker(
     //Listen for new GPS coordinates.
     private val locationListener = object : LocationListener {
 
-        override fun onLocationChanged(location : Location) {
+        override fun onLocationChanged(location: Location) {
 
             //Pass the latest location to the workout
             onLocationUpdate(location)
         }
+    }
+    // Check whether precise location permission is granted.
+    fun hasLocationPermission(): Boolean {
 
-        // Check whether precise location permission is granted.
-        fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            appContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
-            return ContextCompat.checkSelfPermission(
-                appContext,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        }
+    // Check whether GPS is enabled on the phone.
+    fun isGpsEnabled(): Boolean {
+
+        return locationManager.isProviderEnabled(
+            LocationManager.GPS_PROVIDER
+        )
     }
 }
+
