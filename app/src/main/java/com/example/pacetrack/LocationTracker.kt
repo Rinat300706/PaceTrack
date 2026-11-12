@@ -8,6 +8,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import androidx.core.content.ContextCompat
+import android.os.Looper
 
 class LocationTracker(
     context: Context,
@@ -47,5 +48,32 @@ class LocationTracker(
             LocationManager.GPS_PROVIDER
         )
     }
+
+    // Start receiving GPS location updates.
+    fun start(): Boolean {
+
+        // Do not start if permission or GPS is unavailable.
+        if (!hasLocationPermission() || !isGpsEnabled()) {
+            return false
+        }
+
+        return try {
+
+            // Request GPS updates approximately every 2 seconds.
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                2000L,
+                0f,
+                locationListener,
+                Looper.getMainLooper()
+            )
+
+            true
+
+        } catch (exception: SecurityException) {
+            false
+        }
+    }
+
 }
 
