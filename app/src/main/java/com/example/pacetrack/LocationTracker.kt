@@ -44,12 +44,32 @@ class LocationTracker(
             }
 
             // Calculate distance from the previous GPS reading.
+
             lastLocation?.let { previousLocation ->
 
                 val distance = previousLocation.distanceTo(location)
 
+                // Calculate the time between GPS readings in seconds.
+                val elapsedSeconds =
+                    (location.elapsedRealtimeNanos -
+                            previousLocation.elapsedRealtimeNanos) / 1_000_000_000f
+
+                // Ignore readings with invalid time differences.
+                if (elapsedSeconds <= 0f) {
+                    return
+                }
+
+                // Calculate the speed between the two GPS points.
+                val speedMetersPerSecond = distance / elapsedSeconds
+
+                // Ignore unusually large GPS jumps.
+                if (speedMetersPerSecond > 8f) {
+                    return
+                }
+
                 totalDistanceMeters += distance
             }
+
 
             // Remember this location for the next update.
             lastLocation = location
