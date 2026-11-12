@@ -23,14 +23,36 @@ class LocationTracker(
             Context.LOCATION_SERVICE
         ) as LocationManager
 
+
+    // Remember the previous GPS location.
+    private var lastLocation: Location? = null
+
+    // Total distance travelled in metres.
+    var totalDistanceMeters = 0f
+        private set
+
+
     //Listen for new GPS coordinates.
     private val locationListener = object : LocationListener {
 
+
         override fun onLocationChanged(location: Location) {
 
-            //Pass the latest location to the workout
+            // Calculate distance from the previous GPS reading.
+            lastLocation?.let { previousLocation ->
+
+                val distance = previousLocation.distanceTo(location)
+
+                totalDistanceMeters += distance
+            }
+
+            // Remember this location for the next update.
+            lastLocation = location
+
+            // Pass the latest location to the workout.
             onLocationUpdate(location)
         }
+
     }
     // Check whether precise location permission is granted.
     fun hasLocationPermission(): Boolean {
@@ -80,6 +102,7 @@ class LocationTracker(
 
         // Remove the registered GPS listener.
         locationManager.removeUpdates(locationListener)
+        lastLocation = null
     }
 
 
