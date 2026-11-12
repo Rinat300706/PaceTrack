@@ -38,6 +38,11 @@ class LocationTracker(
 
         override fun onLocationChanged(location: Location) {
 
+            // Ignore GPS readings that are not accurate enough.
+            if (!location.hasAccuracy() || location.accuracy > 30f) {
+                return
+            }
+
             // Calculate distance from the previous GPS reading.
             lastLocation?.let { previousLocation ->
 
