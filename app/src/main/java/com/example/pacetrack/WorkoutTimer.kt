@@ -1,9 +1,12 @@
-
 package com.example.pacetrack
 
 import android.os.SystemClock
 
-class WorkoutTimer {
+// Tracks the elapsed time of a workout.
+// The clock can be replaced in unit tests so time can be simulated.
+class WorkoutTimer(
+    private val clock: () -> Long = { SystemClock.elapsedRealtime() }
+) {
 
     // Stores the total time recorded before pausing.
     private var accumulatedTime = 0L
@@ -20,7 +23,7 @@ class WorkoutTimer {
     // Starts a new workout and resets the timer to zero.
     fun start() {
         accumulatedTime = 0L
-        startedAt = SystemClock.elapsedRealtime()
+        startedAt = clock()
         running = true
         started = true
     }
@@ -32,8 +35,7 @@ class WorkoutTimer {
         if (running) {
 
             // Save the time completed since starting or resuming.
-            accumulatedTime +=
-                SystemClock.elapsedRealtime() - startedAt
+            accumulatedTime += clock() - startedAt
 
             // Mark the timer as paused.
             running = false
@@ -48,11 +50,25 @@ class WorkoutTimer {
         if (started && !running) {
 
             // Record when the workout resumes.
-            startedAt = SystemClock.elapsedRealtime()
+            startedAt = clock()
 
             // Mark the timer as running again.
             running = true
         }
     }
-}
 
+    // Returns the total elapsed workout time in milliseconds.
+    fun getElapsedTime(): Long {
+
+        // If the timer is running, include the current running period.
+        return if (running) {
+            accumulatedTime + (clock() - startedAt)
+        } else {
+            // If paused or finished, return the saved duration.
+            accumulatedTime
+        }
+    }
+
+    // Checks whether the timer is currently counting.
+    fun isRunning(): Boolean = running
+}
