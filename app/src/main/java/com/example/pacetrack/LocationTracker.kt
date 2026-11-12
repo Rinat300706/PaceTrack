@@ -75,5 +75,13 @@ class LocationTracker(
         }
     }
 
+    // Stop receiving GPS updates.
+    fun stop() {
+
+        // Remove the registered GPS listener.
+        locationManager.removeUpdates(locationListener)
+    }
+
+
 }
 
