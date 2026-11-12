@@ -56,6 +56,16 @@ class WorkoutTimer(
             running = true
         }
     }
+    fun finish(): Long {
+
+        // Save any time from the current running period.
+        pause()
+
+        // The workout is over, so it can't be resumed.
+        started = false
+
+        // Return the final duration for the workout summary.
+        return accumulatedTime  }
 
     // Returns the total elapsed workout time in milliseconds.
     fun getElapsedTime(): Long {
