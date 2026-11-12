@@ -110,6 +110,14 @@ class LocationTracker(
         lastLocation = null
     }
 
+    // Reset the distance when beginning a new workout.
+    fun resetDistance() {
+
+        totalDistanceMeters = 0f
+        lastLocation = null
+    }
+
+
 
 }
 
