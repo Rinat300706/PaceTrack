@@ -82,3 +82,16 @@ class WorkoutTimer(
     // Checks whether the timer is currently counting.
     fun isRunning(): Boolean = running
 }
+fun formatElapsedTime(elapsedMillis: Long): String {
+
+    // Convert milliseconds into whole seconds.
+    val totalSeconds = elapsedMillis / 1000
+
+    // Split the seconds into hours, minutes and seconds.
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+
+    // Pad each part to two digits, e.g. 5 -> "05".
+    return String.format(java.util.Locale.ROOT, "%02d:%02d:%02d", hours, minutes, seconds)
+}
