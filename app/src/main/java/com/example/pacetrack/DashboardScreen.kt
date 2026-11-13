@@ -55,6 +55,8 @@ import androidx.compose.runtime.LaunchedEffect
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import com.google.maps.android.compose.Polyline
+import androidx.compose.ui.graphics.Color
 
 
 @Composable
@@ -567,6 +569,23 @@ fun DashboardScreen() {
                                 ),
                                 title = "Current Location"
                             )
+
+                            // Convert recorded GPS locations into map coordinates.
+                            val routeCoordinates = locationTracker.getRoutePoints().map { point ->
+                                LatLng(
+                                    point.latitude,
+                                    point.longitude
+                                )
+                            }
+
+                            // Draw a blue line when we have at least two GPS points.
+                            if (routeCoordinates.size >= 2) {
+                                Polyline(
+                                    points = routeCoordinates,
+                                    color = Color(0xFF1565C0),
+                                    width = 12f
+                                )
+                            }
                         }
                     }
 
