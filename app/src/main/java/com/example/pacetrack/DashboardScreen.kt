@@ -53,6 +53,8 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import androidx.compose.runtime.LaunchedEffect
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberUpdatedMarkerState
 
 
 @Composable
@@ -540,6 +542,7 @@ fun DashboardScreen() {
 
 
                     // Display an interactive Google Map
+
                     GoogleMap(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -548,7 +551,25 @@ fun DashboardScreen() {
                         onMapLoaded = {
                             mapLoaded.value = true
                         }
-                    )
+                    ) {
+
+                        // Display a marker at the latest GPS location.
+                        latestGpsLocation.value?.let { location ->
+
+                            val currentPosition = LatLng(
+                                location.latitude,
+                                location.longitude
+                            )
+
+                            Marker(
+                                state = rememberUpdatedMarkerState(
+                                    position = currentPosition
+                                ),
+                                title = "Current Location"
+                            )
+                        }
+                    }
+
 
 
 
