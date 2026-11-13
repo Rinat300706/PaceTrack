@@ -38,6 +38,9 @@ android {
 }
 
 dependencies {
+    // Google Maps support for Jetpack Compose.
+    implementation("com.google.maps.android:maps-compose:6.10.0")
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
