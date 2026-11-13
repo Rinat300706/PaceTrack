@@ -57,6 +57,9 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.Polyline
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 
 @Composable
@@ -194,27 +197,81 @@ fun DashboardScreen() {
 
 
     // Start GPS during a workout and stop it when leaving.
-    DisposableEffect(workoutStage.intValue, locationTracker) {
 
-        if (workoutStage.intValue == 2) {
+    // Observe whether PaceTrack is in the foreground.
+    val lifecycleOwner = LocalLifecycleOwner.current
 
+    // Manage GPS when entering and leaving the workout.
+    DisposableEffect(
+        workoutStage.intValue,
+        locationTracker,
+        lifecycleOwner
+    ) {
+
+        val isWorkoutActive = workoutStage.intValue == 2
+        var gpsRunning = false
+
+        // Reset distance only for a new workout.
+        if (isWorkoutActive) {
             locationTracker.resetDistance()
             latestGpsLocation.value = null
             distanceMeters.value = 0f
+        }
 
-            val started = locationTracker.start()
+        // Start GPS only when needed.
+        fun startTracking() {
+            if (isWorkoutActive && !gpsRunning) {
+                val started = locationTracker.start()
+                gpsRunning = started
 
-            gpsError.value = if (started) {
-                null
-            } else {
-                "GPS could not start. Check that location is enabled."
+                gpsError.value = if (started) {
+                    null
+                } else {
+                    "GPS could not start. Check location settings."
+                }
             }
         }
 
+        // Stop GPS to avoid unnecessary tracking.
+        fun stopTracking() {
+            if (gpsRunning) {
+                locationTracker.stop()
+                gpsRunning = false
+            }
+        }
+
+        // Listen for activity lifecycle changes.
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+
+                Lifecycle.Event.ON_START -> {
+                    startTracking()
+                }
+
+                Lifecycle.Event.ON_STOP -> {
+                    stopTracking()
+                }
+
+                else -> Unit
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // Start even if the activity is already visible.
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(
+                Lifecycle.State.STARTED
+            )
+        ) {
+            startTracking()
+        }
+
         onDispose {
-            locationTracker.stop()
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            stopTracking()
         }
     }
+
 
     // Message shown if location permission is not granted.
     val locationPermissionMessage = remember {
