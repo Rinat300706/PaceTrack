@@ -1,6 +1,5 @@
 package com.example.pacetrack
 
-import android.R.attr.onClick
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -163,6 +162,10 @@ fun DashboardScreen() {
     val latestGpsLocation = remember {
         mutableStateOf<android.location.Location?>(null)
     }
+    // Store the distance so the screen updates when GPS changes.
+    val distanceMeters = remember {
+        mutableStateOf(0f)
+    }
 
     // Show an error if GPS cannot start.
     val gpsError = remember {
@@ -170,11 +173,15 @@ fun DashboardScreen() {
     }
 
     // Create one GPS tracker for this screen.
+
     val locationTracker = remember(context) {
-        LocationTracker(context) { location ->
+        LocationTracker(context) { location, distance ->
+
             latestGpsLocation.value = location
+            distanceMeters.value = distance
         }
     }
+
 
     // Start GPS during a workout and stop it when leaving.
     DisposableEffect(workoutStage.intValue, locationTracker) {
@@ -183,6 +190,7 @@ fun DashboardScreen() {
 
             locationTracker.resetDistance()
             latestGpsLocation.value = null
+            distanceMeters.value = 0f
 
             val started = locationTracker.start()
 
@@ -462,11 +470,13 @@ fun DashboardScreen() {
                             ) {
                                 Column {
                                     Text("Distance")
+
                                     Text(
-                                        "-- km",
+                                        text = "%.2f km".format(distanceMeters.value / 1000f),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 20.sp
                                     )
+
                                 }
 
                                 Column {

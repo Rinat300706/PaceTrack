@@ -12,7 +12,7 @@ import android.os.Looper
 
 class LocationTracker(
     context: Context,
-    private val onLocationUpdate: (Location) -> Unit
+    private val onLocationUpdate: (Location, Float) -> Unit
 ) {
 
     private val appContext = context.applicationContext
@@ -75,7 +75,7 @@ class LocationTracker(
             lastLocation = location
 
             // Pass the latest location to the workout.
-            onLocationUpdate(location)
+            onLocationUpdate(location, totalDistanceMeters)
         }
 
     }
