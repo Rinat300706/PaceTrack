@@ -647,7 +647,11 @@ fun DashboardScreen() {
 
                             Text("Elapsed Time: --:--:--")
 
-                            Text("Distance: -- km")
+
+                            Text(
+                                text = "Distance: %.2f km".format(distanceMeters.value / 1000f)
+                            )
+
 
                             Text("Average Pace: -- /km")
 
@@ -657,9 +661,12 @@ fun DashboardScreen() {
                         }
                     }
 
+
                     Text(
-                        "This was an interface preview. No workout has been recorded or saved."
+                        "Your GPS distance was tracked during this workout. " +
+                                "The session has not been saved to History yet."
                     )
+
 
                     Button(
                         onClick = {
