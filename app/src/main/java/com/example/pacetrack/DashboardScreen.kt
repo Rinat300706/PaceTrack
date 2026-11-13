@@ -47,6 +47,10 @@ import androidx.core.content.ContextCompat
 import android.provider.Settings
 import android.net.Uri
 import androidx.compose.runtime.DisposableEffect
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 
 
 @Composable
@@ -432,6 +436,15 @@ fun DashboardScreen() {
 
             // SCREEN 3: Active workout
             2 -> {
+
+                // Set an initial location for testing the map.
+                val cameraPositionState = rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(
+                        LatLng(53.3498, -6.2603),
+                        14f
+                    )
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -496,6 +509,15 @@ fun DashboardScreen() {
                             }
                         }
                     }
+
+
+                    // Display an interactive Google Map.
+                    GoogleMap(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(260.dp),
+                        cameraPositionState = cameraPositionState
+                    )
 
 
                     Text(
