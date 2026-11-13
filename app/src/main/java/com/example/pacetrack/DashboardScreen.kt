@@ -47,6 +47,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import android.provider.Settings
 import android.net.Uri
+import androidx.compose.runtime.DisposableEffect
 
 
 @Composable
@@ -157,6 +158,45 @@ fun DashboardScreen() {
     val context = LocalContext.current
 
     val workoutStage = remember { mutableIntStateOf(0) }
+
+    // Store the latest GPS reading.
+    val latestGpsLocation = remember {
+        mutableStateOf<android.location.Location?>(null)
+    }
+
+    // Show an error if GPS cannot start.
+    val gpsError = remember {
+        mutableStateOf<String?>(null)
+    }
+
+    // Create one GPS tracker for this screen.
+    val locationTracker = remember(context) {
+        LocationTracker(context) { location ->
+            latestGpsLocation.value = location
+        }
+    }
+
+    // Start GPS during a workout and stop it when leaving.
+    DisposableEffect(workoutStage.intValue, locationTracker) {
+
+        if (workoutStage.intValue == 2) {
+
+            locationTracker.resetDistance()
+            latestGpsLocation.value = null
+
+            val started = locationTracker.start()
+
+            gpsError.value = if (started) {
+                null
+            } else {
+                "GPS could not start. Check that location is enabled."
+            }
+        }
+
+        onDispose {
+            locationTracker.stop()
+        }
+    }
 
     // Message shown if location permission is not granted.
     val locationPermissionMessage = remember {
@@ -447,7 +487,20 @@ fun DashboardScreen() {
                         }
                     }
 
-                    Text("Preview only: Real timer and GPS tracking are not connected yet.")
+
+                    Text(
+                        text = when {
+                            gpsError.value != null -> gpsError.value ?: ""
+
+                            latestGpsLocation.value == null ->
+                                "GPS: Waiting for location..."
+
+                            else -> "GPS: Location received"
+                        }
+                    )
+
+                    Text("Timer and pace are still previews.")
+
 
                     Button(
                         onClick = {
