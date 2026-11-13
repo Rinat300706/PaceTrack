@@ -51,6 +51,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import androidx.compose.runtime.LaunchedEffect
+import com.google.android.gms.maps.CameraUpdateFactory
 
 
 @Composable
@@ -445,6 +447,32 @@ fun DashboardScreen() {
                     )
                 }
 
+                // Remember whether Google Maps has finished loading.
+                val mapLoaded = remember { mutableStateOf(false) }
+
+                // Follow the latest GPS location during the workout.
+                LaunchedEffect(mapLoaded.value, latestGpsLocation.value) {
+
+                    val location = latestGpsLocation.value
+
+                    if (mapLoaded.value && location != null) {
+
+                        val currentPosition = LatLng(
+                            location.latitude,
+                            location.longitude
+                        )
+
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(
+                                currentPosition,
+                                17f
+                            ),
+                            durationMs = 700
+                        )
+                    }
+                }
+
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -511,13 +539,17 @@ fun DashboardScreen() {
                     }
 
 
-                    // Display an interactive Google Map.
+                    // Display an interactive Google Map
                     GoogleMap(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(260.dp),
-                        cameraPositionState = cameraPositionState
+                        cameraPositionState = cameraPositionState,
+                        onMapLoaded = {
+                            mapLoaded.value = true
+                        }
                     )
+
 
 
                     Text(
