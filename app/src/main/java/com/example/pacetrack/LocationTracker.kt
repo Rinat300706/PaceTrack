@@ -30,6 +30,8 @@ class LocationTracker(
     // Total distance travelled in metres.
     var totalDistanceMeters = 0f
         private set
+    // Store the GPS points visited during the workout.
+    private val routePoints = mutableListOf<Location>()
 
 
     //Listen for new GPS coordinates.
@@ -70,7 +72,8 @@ class LocationTracker(
                 totalDistanceMeters += distance
             }
 
-
+            // Save this GPS point for the workout route.
+            routePoints.add(Location(location))
             // Remember this location for the next update.
             lastLocation = location
 
@@ -135,9 +138,13 @@ class LocationTracker(
 
         totalDistanceMeters = 0f
         lastLocation = null
+        routePoints.clear()
     }
 
-
+    // Return a copy of the GPS route recorded so far.
+    fun getRoutePoints(): List<Location> {
+        return routePoints.toList()
+    }
 
 }
 
