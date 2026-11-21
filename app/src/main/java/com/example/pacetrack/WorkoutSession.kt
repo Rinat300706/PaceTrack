@@ -7,5 +7,9 @@ import androidx.room.PrimaryKey
 data class WorkoutSession(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
+    val id: Long = 0,
+
+    val activityType: String,
+
+    val startTime: Long
 )
