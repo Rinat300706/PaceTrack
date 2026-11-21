@@ -11,5 +11,9 @@ data class WorkoutSession(
 
     val activityType: String,
 
-    val startTime: Long
+    val startTime: Long,
+
+    val durationMillis: Long,
+
+    val distanceMetres: Double
 )
