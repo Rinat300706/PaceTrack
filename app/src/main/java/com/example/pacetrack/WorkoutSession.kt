@@ -15,5 +15,11 @@ data class WorkoutSession(
 
     val durationMillis: Long,
 
-    val distanceMetres: Double
+    val distanceMetres: Double,
+
+
+    val averagePaceSecondsPerKm: Long? = null,
+
+    val distanceGoalKm: Double? = null
 )
+
