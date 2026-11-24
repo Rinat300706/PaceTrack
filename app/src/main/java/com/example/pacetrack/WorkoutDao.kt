@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import androidx.room.Delete
 
 //Database operations for saved workouts.
 //Room writes the actual SQL code for these functions when the app builds.
@@ -20,4 +21,8 @@ interface WorkoutDao {
     //History screen updates automatically when a workout is added.
     @Query("SELECT * FROM workout_sessions ORDER BY startTime DESC")
     fun getAllWorkouts(): Flow<List<WorkoutSession>>
+
+    //Deletes saved workout.
+    @Delete
+    suspend fun deleteWorkout(workout: WorkoutSession)
 }
