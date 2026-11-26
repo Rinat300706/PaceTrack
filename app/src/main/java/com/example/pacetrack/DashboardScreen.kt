@@ -72,6 +72,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.mutableLongStateOf
 import kotlinx.coroutines.delay
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 fun calculateAveragePaceSecondsPerKm(
@@ -206,8 +207,14 @@ fun DashboardScreen() {
     // Use Liam's workout timer.
     val workoutTimer = remember { WorkoutTimer() }
 
+    // Connect the dashboard to Liam's Room database.
+    val workoutViewModel: WorkoutViewModel = viewModel()
+
     // Store the elapsed time for displaying on screen.
     val elapsedMillis = remember { mutableLongStateOf(0L) }
+
+    // Store when the workout started for Activity History.
+    val workoutStartTime = remember { mutableLongStateOf(0L) }
 
     // Store the latest GPS reading.
     val latestGpsLocation = remember {
@@ -316,7 +323,11 @@ fun DashboardScreen() {
 
         when (workoutStage.intValue) {
 
+
             2 -> {
+                // Record the actual date and time the workout begins.
+                workoutStartTime.longValue = System.currentTimeMillis()
+
                 // Start a new timer when the workout begins.
                 workoutTimer.start()
                 elapsedMillis.longValue = 0L
@@ -329,6 +340,7 @@ fun DashboardScreen() {
                     delay(250L)
                 }
             }
+
 
             3 -> {
                 // Stop the timer and save its final duration.
@@ -847,9 +859,36 @@ fun DashboardScreen() {
                         Spacer(modifier = Modifier.weight(1f))
 
                         Button(
+
                             onClick = {
+
+                                // Stop the timer and record the final duration.
+                                elapsedMillis.longValue = workoutTimer.finish()
+
+                                // Save the completed workout to Liam's Room database.
+                                workoutViewModel.saveWorkout(
+                                    WorkoutSession(
+                                        activityType = activity_options[selected_activity.value],
+                                        startTime = workoutStartTime.longValue,
+                                        durationMillis = elapsedMillis.longValue,
+                                        distanceMetres = distanceMeters.value.toDouble(),
+                                        averagePaceSecondsPerKm =
+                                            calculateAveragePaceSecondsPerKm(
+                                                elapsedMillis.longValue,
+                                                distanceMeters.value
+                                            ),
+                                        distanceGoalKm = if (goal_enabled.value && validGoal) {
+                                            goal_distance.value.toDoubleOrNull()
+                                        } else {
+                                            null
+                                        }
+                                    )
+                                )
+
+                                // Navigate to the completed workout screen.
                                 workoutStage.intValue = 3
                             },
+
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -859,7 +898,7 @@ fun DashboardScreen() {
                             )
                         ) {
                             Text(
-                                text = "Finish Preview",
+                                text = "Finish Workout",
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -882,7 +921,7 @@ fun DashboardScreen() {
                 ) {
 
                     Text(
-                        text = "Workout Preview Finished",
+                        text = "Workout Completed",
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp
                     )
@@ -924,10 +963,11 @@ fun DashboardScreen() {
                     }
 
 
+
                     Text(
-                        "Your GPS distance was tracked during this workout. " +
-                                "The session has not been saved to History yet."
+                        "Workout completed! Your activity has been saved to History."
                     )
+
 
 
                     Button(
