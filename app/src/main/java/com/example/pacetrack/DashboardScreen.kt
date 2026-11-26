@@ -54,7 +54,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import androidx.compose.runtime.LaunchedEffect
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.maps.android.compose.Marker
+import androidx.compose.material3.MaterialTheme
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.Polyline
 import androidx.compose.ui.graphics.Color
@@ -917,10 +917,12 @@ fun DashboardScreen() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
+
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF17324D),
-                                contentColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             )
+
                         ) {
                             Text(
                                 text = "Finish Workout",

@@ -33,29 +33,32 @@ class HistoryActivity : ComponentActivity() {
 
         setContent {
 
-            BackHandler {
-                returnToHome()
-            }
+            PaceTrackTheme {
 
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-
-                Box(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    HistoryScreen()
+                BackHandler {
+                    returnToHome()
                 }
 
-                OutlinedButton(
-                    onClick = {
-                        returnToHome()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Text("Back to Home")
+
+                    Box(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        HistoryScreen()
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            returnToHome()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text("Back to Home")
+                    }
                 }
             }
         }

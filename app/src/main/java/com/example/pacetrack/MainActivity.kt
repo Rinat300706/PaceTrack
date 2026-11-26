@@ -10,9 +10,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         setContent {
-            DashboardScreen()
+            PaceTrackTheme {
+                DashboardScreen()
+            }
         }
+
 
         Log.i("PaceTrack", "PaceTrack MainActivity created")
     }
