@@ -432,6 +432,25 @@ fun DashboardScreen() {
                         .fillMaxSize()
                         .padding(20.dp)
                 ) {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                val intent = Intent(
+                                    context,
+                                    SettingsActivity::class.java
+                                )
+                                context.startActivity(intent)
+                            }
+                        ) {
+                            Text("⚙ Settings")
+                        }
+                    }
+
+
                     Spacer(modifier = Modifier.height(80.dp))
 
                     WelcomeMessage()
