@@ -19,6 +19,9 @@ import androidx.compose.material3.Card
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -35,13 +38,7 @@ fun formatPace(secondsPerKm: Long?): String {
 fun formatDate(millis: Long): String {
     return SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault()).format(Date(millis))
 }
-data class HistorySession(
-    val title: String,
-    val type: String,
-    val distance: String,
-    val time: String,
-    val pace: String
-)
+
 @Composable
 fun HistoryStat(
     label: String,
@@ -56,6 +53,7 @@ fun HistoryStat(
         Text(text = value)
     }
 }
+
 @Composable
 fun HistoryCard(
     title: String,
@@ -110,8 +108,11 @@ fun EmptyHistoryMessage() {
         }
     }
 }
+
 @Composable
-fun HistoryScreen() {
+fun HistoryScreen(viewModel: WorkoutViewModel = viewModel()) {
+    val workouts by viewModel.allWorkouts.collectAsState(initial = emptyList())
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -131,14 +132,6 @@ fun HistoryScreen() {
 
             Text("Review your previous walks and runs")
 
-            Text("Example sessions - layout preview")
-
-            val sessions = listOf(
-                HistorySession("Sample Walk", "Walk", "3 km", "45 min", "15:00 /km"),
-                HistorySession("Sample Run", "Run", "5 km", "30 min", "6:00 /km"),
-                HistorySession("Evening Walk", "Walk", "2 km", "28 min", "14:00 /km")
-            )
-
             val filter_options = listOf("All", "Walk", "Run")
             val selected_filter = remember { mutableIntStateOf(0) }
 
@@ -146,19 +139,19 @@ fun HistoryScreen() {
                 selected_filter.intValue = it
             }
 
-            val shown_sessions =
-                if (selected_filter.intValue == 0) sessions
-                else sessions.filter { it.type == filter_options[selected_filter.intValue] }
+            val shown_workouts =
+                if (selected_filter.intValue == 0) workouts
+                else workouts.filter { it.activityType == filter_options[selected_filter.intValue] }
 
-            if (shown_sessions.isEmpty()) {
+            if (shown_workouts.isEmpty()) {
                 EmptyHistoryMessage()
             } else {
-                for (session in shown_sessions) {
+                for (workout in shown_workouts) {
                     HistoryCard(
-                        title = session.title,
-                        distance = session.distance,
-                        time = session.time,
-                        pace = session.pace
+                        title = "${workout.activityType} - ${formatDate(workout.startTime)}",
+                        distance = formatDistance(workout.distanceMetres),
+                        time = formatElapsedTime(workout.durationMillis),
+                        pace = formatPace(workout.averagePaceSecondsPerKm)
                     )
                 }
             }
