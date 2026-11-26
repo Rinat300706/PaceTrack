@@ -73,6 +73,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.mutableLongStateOf
 import kotlinx.coroutines.delay
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
 
 
 fun calculateAveragePaceSecondsPerKm(
@@ -107,7 +108,7 @@ fun WelcomeMessage() {
             fontSize = 30.sp
         )
 
-        Text("Track your walks and runs")
+        Text(stringResource(R.string.home_subtitle))
     }
 }
 
@@ -144,27 +145,36 @@ fun GoalControls(
     goal_distance: MutableState<String>
 ) {
 
+
     Text(
-        text = "Choose your activity",
+        text = stringResource(R.string.workout_choose_activity),
         fontWeight = FontWeight.Bold
     )
 
+
+
     RadioButtonGroup(
-        activity_options,
-        selected_activity.value
+        radio_options = listOf(
+            stringResource(R.string.history_walk),
+            stringResource(R.string.history_run)
+        ),
+        selected = selected_activity.value
     ) {
         selected_activity.value = it
     }
+
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Text(
-            text = "Enable distance goal",
+            text = stringResource(R.string.workout_enable_goal),
             fontWeight = FontWeight.Bold
         )
+
 
         Checkbox(
             checked = goal_enabled.value,
@@ -176,10 +186,12 @@ fun GoalControls(
 
     if (goal_enabled.value) {
 
+
         Text(
-            text = "Distance Target (km)",
+            text = stringResource(R.string.workout_distance_target),
             fontWeight = FontWeight.Bold
         )
+
 
         TextField(
             value = goal_distance.value,
@@ -192,7 +204,14 @@ fun GoalControls(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Text("Your distance goal is: ${goal_distance.value} km")
+
+        Text(
+            text = stringResource(
+                R.string.workout_goal_display,
+                goal_distance.value
+            )
+        )
+
     }
 }
 
@@ -272,7 +291,7 @@ fun DashboardScreen() {
                 gpsError.value = if (started) {
                     null
                 } else {
-                    "GPS could not start. Check location settings."
+                    context.getString(R.string.gps_start_error)
                 }
             }
         }
@@ -378,16 +397,17 @@ fun DashboardScreen() {
                 workoutStage.intValue = 2
             }
 
+
             approximateGranted -> {
                 locationPermissionMessage.value =
-                    "Precise location is needed for accurate workout distance. " +
-                            "Enable precise location for PaceTrack in your phone settings."
+                    context.getString(R.string.location_precise_required)
             }
 
             else -> {
                 locationPermissionMessage.value =
-                    "Location permission is required to track your workout distance."
+                    context.getString(R.string.location_permission_required)
             }
+
         }
     }
 
@@ -446,7 +466,7 @@ fun DashboardScreen() {
                                 context.startActivity(intent)
                             }
                         ) {
-                            Text("⚙ Settings")
+                            Text("⚙ " + stringResource(R.string.settings_title))
                         }
                     }
 
@@ -476,7 +496,7 @@ fun DashboardScreen() {
                             .fillMaxWidth()
                             .height(56.dp)
                     ) {
-                        Text("View History")
+                        Text(stringResource(R.string.home_view_history))
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -489,7 +509,7 @@ fun DashboardScreen() {
                             .fillMaxWidth()
                             .height(56.dp)
                     ) {
-                        Text("Start Workout")
+                        Text(stringResource(R.string.home_start_workout))
                     }
                 }
             }
@@ -505,7 +525,7 @@ fun DashboardScreen() {
                 ) {
 
                     Text(
-                        text = "Workout Setup",
+                        text = stringResource(R.string.workout_setup_title),
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp
                     )
@@ -527,7 +547,9 @@ fun DashboardScreen() {
                     }
 
                     if (!validGoal) {
-                        Text("Enter a valid distance greater than 0 km.")
+
+                        Text(stringResource(R.string.workout_invalid_goal))
+
                     }
 
                     Button(
@@ -557,7 +579,20 @@ fun DashboardScreen() {
                             .fillMaxWidth()
                             .height(56.dp)
                     ) {
-                        Text("Begin ${activity_options[selected_activity.value]}")
+
+                        val activityLabel = if (selected_activity.value == 0) {
+                            stringResource(R.string.history_walk)
+                        } else {
+                            stringResource(R.string.history_run)
+                        }
+
+                        Text(
+                            text = stringResource(
+                                R.string.workout_begin_activity,
+                                activityLabel
+                            )
+                        )
+
                     }
 
 
@@ -583,7 +618,9 @@ fun DashboardScreen() {
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Open Location Settings")
+
+                            Text(stringResource(R.string.location_open_settings))
+
                         }
                     }
 
@@ -594,17 +631,15 @@ fun DashboardScreen() {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Back to Home")
+                        Text(stringResource(R.string.settings_back_home))
                     }
                 }
             }
 
             // SCREEN 3: Active workout
             2 -> {
-
                 // Read the direction the phone is facing.
                 val phoneHeading = rememberPhoneHeading()
-
                 // Set an initial location for testing the map.
                 val cameraPositionState = rememberCameraPositionState {
                     position = CameraPosition.fromLatLngZoom(
@@ -612,22 +647,16 @@ fun DashboardScreen() {
                         14f
                     )
                 }
-
                 // Remember whether Google Maps has finished loading.
                 val mapLoaded = remember { mutableStateOf(false) }
-
                 // Follow the latest GPS location during the workout.
                 LaunchedEffect(mapLoaded.value, latestGpsLocation.value) {
-
                     val location = latestGpsLocation.value
-
                     if (mapLoaded.value && location != null) {
-
                         val currentPosition = LatLng(
                             location.latitude,
                             location.longitude
                         )
-
                         cameraPositionState.animate(
                             update = CameraUpdateFactory.newLatLngZoom(
                                 currentPosition,
@@ -637,13 +666,10 @@ fun DashboardScreen() {
                         )
                     }
                 }
-
                 // Allow the map and workout controls to overlap.
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
-
-
                     GoogleMap(
                         modifier = Modifier.fillMaxSize(),
                         cameraPositionState = cameraPositionState,
@@ -654,17 +680,12 @@ fun DashboardScreen() {
                             mapLoaded.value = true
                         }
                     ) {
-
-
                     // Display the current GPS location.
                         latestGpsLocation.value?.let { location ->
-
                             val currentPosition = LatLng(
                                 location.latitude,
                                 location.longitude
                             )
-
-
                             MarkerComposable(
                                 state = rememberUpdatedMarkerState(
                                     position = currentPosition
@@ -691,8 +712,6 @@ fun DashboardScreen() {
                                     )
                                 }
                             }
-
-
                             // Convert GPS route points into map coordinates.
                             val routeCoordinates =
                                 locationTracker.getRoutePoints().map { point ->
@@ -701,7 +720,6 @@ fun DashboardScreen() {
                                         point.longitude
                                     )
                                 }
-
                             // Draw the route as a blue line.
                             if (routeCoordinates.size >= 2) {
                                 Polyline(
@@ -712,23 +730,21 @@ fun DashboardScreen() {
                             }
                         }
                     }
-
-
-
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-
                         Text(
-                            text = "${activity_options[selected_activity.value]} Session",
+                            text = if (selected_activity.value == 0) {
+                                stringResource(R.string.workout_walk_session)
+                            } else {
+                                stringResource(R.string.workout_run_session)
+                            },
                             fontWeight = FontWeight.Bold,
                             fontSize = 26.sp
                         )
-
-
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(20.dp),
@@ -743,26 +759,21 @@ fun DashboardScreen() {
                                 modifier = Modifier.padding(12.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-
-
-
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-
                                     // Workout time
                                     Column(
                                         modifier = Modifier.weight(1f),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "TIME",
+                                            text = stringResource(R.string.history_time).uppercase(),
                                             fontSize = 12.sp,
                                             color = Color.DarkGray
                                         )
-
                                         Text(
                                             text = formatElapsedTime(elapsedMillis.longValue),
                                             fontWeight = FontWeight.Bold,
@@ -770,18 +781,16 @@ fun DashboardScreen() {
                                             color = Color(0xFF17324D)
                                         )
                                     }
-
                                     // GPS distance
                                     Column(
                                         modifier = Modifier.weight(1f),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "DISTANCE",
+                                            text = stringResource(R.string.history_distance).uppercase(),
                                             fontSize = 12.sp,
                                             color = Color.DarkGray
                                         )
-
                                         Text(
                                             text = "%.2f km".format(distanceMeters.value / 1000f),
                                             fontWeight = FontWeight.Bold,
@@ -789,19 +798,16 @@ fun DashboardScreen() {
                                             color = Color(0xFF17324D)
                                         )
                                     }
-
                                     // Average pace
                                     Column(
                                         modifier = Modifier.weight(1f),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "PACE",
+                                            text = stringResource(R.string.history_pace).uppercase(),
                                             fontSize = 12.sp,
                                             color = Color.DarkGray
                                         )
-
-
                                         Text(
                                             text = formatPace(
                                                 calculateAveragePaceSecondsPerKm(
@@ -813,26 +819,15 @@ fun DashboardScreen() {
                                             fontSize = 18.sp,
                                             color = Color(0xFF17324D)
                                         )
-
                                     }
                                 }
-
-
                                 if (goal_enabled.value && validGoal) {
                                     HorizontalDivider()
-                                    Text("Distance Goal")
+                                    Text(stringResource(R.string.workout_distance_goal))
                                     Text("${goal_distance.value} km")
                                 }
                             }
                         }
-
-
-
-
-
-
-
-
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(14.dp),
@@ -843,23 +838,19 @@ fun DashboardScreen() {
                                 defaultElevation = 4.dp
                             )
                         ) {
-
                             Column(
                                 modifier = Modifier.padding(12.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-
                                 // Show the current GPS tracking status.
                                 Text(
                                     text = when {
                                         gpsError.value != null ->
                                             gpsError.value ?: ""
-
                                         latestGpsLocation.value == null ->
-                                            "GPS: Waiting for location..."
-
+                                            stringResource(R.string.gps_waiting)
                                         else ->
-                                            "GPS: Tracking active"
+                                            stringResource(R.string.gps_tracking)
                                     },
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp,
@@ -869,27 +860,20 @@ fun DashboardScreen() {
                                         Color(0xFF17324D)
                                     }
                                 )
-
                                 // Explain which statistics are unfinished.
                                 Text(
-                                    text = "Live time, distance and pace are now connected.",
+                                    text = stringResource(R.string.workout_live_stats),
                                     fontSize = 12.sp,
                                     color = Color.DarkGray
                                 )
                             }
                         }
-
-
                         // Push the Finish button to the bottom of the screen.
                         Spacer(modifier = Modifier.weight(1f))
-
                         Button(
-
                             onClick = {
-
                                 // Stop the timer and record the final duration.
                                 elapsedMillis.longValue = workoutTimer.finish()
-
                                 // Save the completed workout to Liam's Room database.
                                 workoutViewModel.saveWorkout(
                                     WorkoutSession(
@@ -909,23 +893,19 @@ fun DashboardScreen() {
                                         }
                                     )
                                 )
-
                                 // Navigate to the completed workout screen.
                                 workoutStage.intValue = 3
                             },
-
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
-
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             )
-
                         ) {
                             Text(
-                                text = "Finish Workout",
+                                text = stringResource(R.string.workout_finish),
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -933,9 +913,6 @@ fun DashboardScreen() {
                     }
                 }
             }
-
-
-
 
             // SCREEN 4: Workout completed
             3 -> {
@@ -946,13 +923,11 @@ fun DashboardScreen() {
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
                     Text(
-                        text = "Workout Completed",
+                        text = stringResource(R.string.workout_completed_title),
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp
                     )
-
                     Card(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -960,59 +935,68 @@ fun DashboardScreen() {
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-
-                            Text("Activity: ${activity_options[selected_activity.value]}")
-
+                            val activityLabel = if (selected_activity.value == 0) {
+                                stringResource(R.string.history_walk)
+                            } else {
+                                stringResource(R.string.history_run)
+                            }
                             Text(
-                                text = "Elapsed Time: ${formatElapsedTime(elapsedMillis.longValue)}"
+                                text = stringResource(
+                                    R.string.workout_summary_activity,
+                                    activityLabel
+                                )
                             )
-
-
                             Text(
-                                text = "Distance: %.2f km".format(distanceMeters.value / 1000f)
+                                text = stringResource(
+                                    R.string.workout_summary_elapsed,
+                                    formatElapsedTime(elapsedMillis.longValue)
+                                )
                             )
-
-
                             Text(
-                                text = "Average Pace: " + formatPace(
-                                    calculateAveragePaceSecondsPerKm(
-                                        elapsedMillis.longValue,
-                                        distanceMeters.value
+                                text = stringResource(
+                                    R.string.workout_summary_distance,
+                                    "%.2f".format(distanceMeters.value / 1000f)
+                                )
+                            )
+                            Text(
+                                text = stringResource(
+                                    R.string.workout_summary_pace,
+                                    formatPace(
+                                        calculateAveragePaceSecondsPerKm(
+                                            elapsedMillis.longValue,
+                                            distanceMeters.value
+                                        )
                                     )
                                 )
                             )
-
-
                             if (goal_enabled.value && validGoal) {
-                                Text("Distance Goal: ${goal_distance.value} km")
+                                Text(
+                                    text = stringResource(
+                                        R.string.workout_summary_goal,
+                                        goal_distance.value
+                                    )
+                                )
                             }
                         }
                     }
-
-
-
                     Text(
-                        "Workout completed! Your activity has been saved to History."
+                        text = stringResource(R.string.workout_saved_message)
                     )
-
-
-
                     Button(
                         onClick = {
                             workoutStage.intValue = 1
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("New Workout")
+                        Text(stringResource(R.string.workout_new))
                     }
-
                     OutlinedButton(
                         onClick = {
                             workoutStage.intValue = 0
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Back to Home")
+                        Text(stringResource(R.string.settings_back_home))
                     }
                 }
             }

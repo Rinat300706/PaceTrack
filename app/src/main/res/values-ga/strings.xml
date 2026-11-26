@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">PaceTrack</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Socruithe</string>
+    <string name="settings_appearance">Cuma</string>
+    <string name="settings_language">Teanga</string>
+    <string name="settings_accessibility">Inrochtaineacht</string>
+    <string name="settings_about">Maidir le PaceTrack</string>
+    <string name="settings_back_home">Ar ais go dtí an Baile</string>
+
+    <!-- Appearance options -->
+    <string name="theme_system">Córas</string>
+    <string name="theme_light">Geal</string>
+    <string name="theme_dark">Dorcha</string>
+
+    <!-- Language options -->
+    <string name="language_english">Béarla</string>
+    <string name="language_irish">Gaeilge</string>
+
+    <!-- Home screen -->
+    <string name="home_subtitle">Rianaigh do shiúlóidí agus do rithí</string>
+    <string name="home_start_workout">Tosaigh Seisiún</string>
+    <string name="home_view_history">Féach ar an Stair</string>
+
+    <!-- Activity History -->
+    <string name="history_title">Stair na nGníomhaíochtaí</string>
+    <string name="history_subtitle">Féach ar do shiúlóidí agus do rithí roimhe seo</string>
+    <string name="history_empty_title">Níl aon ghníomhaíochtaí taifeadta fós</string>
+    <string name="history_empty_message">Críochnaigh do chéad siúlóid nó rith chun é a fheiceáil anseo.</string>
+
+    <!-- History filters -->
+    <string name="history_all">Uile</string>
+    <string name="history_walk">Siúlóid</string>
+    <string name="history_run">Rith</string>
+
+    <!-- Workout statistics -->
+    <string name="history_distance">Fad</string>
+    <string name="history_time">Am</string>
+    <string name="history_pace">Luas</string>
+    <string name="workout_choose_activity">Roghnaigh do ghníomhaíocht</string>
+    <string name="workout_enable_goal">Cumasaigh sprioc achair</string>
+    <string name="workout_distance_target">Sprioc Achair (km)</string>
+    <string name="workout_goal_display">Is é do sprioc achair: %1$s km</string>
+    <string name="workout_invalid_goal">Iontráil achar bailí níos mó ná 0 km.</string>
+
+    <!-- Begin workout button -->
+    <string name="workout_begin_activity">Tosaigh %1$s</string>
+
+    <!-- GPS location permissions -->
+    <string name="location_precise_required">Tá suíomh beacht ag teastáil chun achar an tseisiúin a thomhas go cruinn. Cumasaigh suíomh beacht do PaceTrack i socruithe do ghutháin.</string>
+
+    <string name="location_permission_required">Tá cead suímh ag teastáil chun achar do sheisiúin a rianú.</string>
+
+    <string name="location_open_settings">Oscail Socruithe Suímh</string>
+
+    <!-- Active Workout screen -->
+    <string name="workout_walk_session">Seisiún Siúlóide</string>
+    <string name="workout_run_session">Seisiún Reatha</string>
+    <string name="workout_finish">Críochnaigh an Seisiún</string>
+
+    <!-- Active Workout: GPS and distance goal -->
+    <string name="workout_distance_goal">Sprioc Achair</string>
+    <string name="gps_waiting">GPS: Ag fanacht le suíomh...</string>
+    <string name="gps_tracking">GPS: Tá an rianú gníomhach</string>
+    <string name="gps_start_error">Níorbh fhéidir GPS a thosú. Seiceáil na socruithe suímh.</string>
+    <string name="workout_live_stats">Tá am, achar agus luas beo ceangailte anois.</string>
+
+    <!-- Workout Completed screen -->
+    <string name="workout_completed_title">Seisiún Críochnaithe</string>
+    <string name="workout_summary_activity">Gníomhaíocht: %1$s</string>
+    <string name="workout_summary_elapsed">Am Imithe: %1$s</string>
+    <string name="workout_summary_distance">Achar: %1$s km</string>
+    <string name="workout_summary_pace">Meánluas: %1$s</string>
+    <string name="workout_summary_goal">Sprioc Achair: %1$s km</string>
+    <string name="workout_saved_message">Críochnaíodh an seisiún! Sábháladh do ghníomhaíocht sa Stair.</string>
+    <string name="workout_new">Seisiún Nua</string>
+
+</resources>

@@ -1,3 +1,82 @@
+
 <resources>
+    <!-- App name -->
     <string name="app_name">PaceTrack</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_accessibility">Accessibility</string>
+    <string name="settings_about">About PaceTrack</string>
+    <string name="settings_back_home">Back to Home</string>
+
+    <!-- Appearance options -->
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- Language options -->
+    <string name="language_english">English</string>
+    <string name="language_irish">Irish (Gaeilge)</string>
+
+    <!-- Home screen -->
+    <string name="home_subtitle">Track your walks and runs</string>
+    <string name="home_start_workout">Start Workout</string>
+    <string name="home_view_history">View History</string>
+
+    <!-- Activity History -->
+    <string name="history_title">Activity History</string>
+    <string name="history_subtitle">Review your previous walks and runs</string>
+    <string name="history_empty_title">No activities recorded yet</string>
+    <string name="history_empty_message">Complete your first walk or run to see it here.</string>
+
+    <!-- History filters -->
+    <string name="history_all">All</string>
+    <string name="history_walk">Walk</string>
+    <string name="history_run">Run</string>
+
+    <!-- Workout statistics -->
+    <string name="history_distance">Distance</string>
+    <string name="history_time">Time</string>
+    <string name="history_pace">Pace</string>
+    <string name="workout_setup_title">Workout Setup</string>
+    <string name="workout_choose_activity">Choose your activity</string>
+    <string name="workout_enable_goal">Enable distance goal</string>
+    <string name="workout_distance_target">Distance Target (km)</string>
+    <string name="workout_goal_display">Your distance goal is: %1$s km</string>
+    <string name="workout_invalid_goal">Enter a valid distance greater than 0 km.</string>
+
+    <!-- Begin workout button -->
+    <string name="workout_begin_activity">Begin %1$s</string>
+
+    <!-- GPS location permissions -->
+    <string name="location_precise_required">Precise location is needed for accurate workout distance. Enable precise location for PaceTrack in your phone settings.</string>
+
+    <string name="location_permission_required">Location permission is required to track your workout distance.</string>
+
+    <string name="location_open_settings">Open Location Settings</string>
+
+    <!-- Active Workout screen -->
+    <string name="workout_walk_session">Walk Session</string>
+    <string name="workout_run_session">Run Session</string>
+    <string name="workout_finish">Finish Workout</string>
+
+    <!-- Active Workout: GPS and distance goal -->
+    <string name="workout_distance_goal">Distance Goal</string>
+    <string name="gps_waiting">GPS: Waiting for location...</string>
+    <string name="gps_tracking">GPS: Tracking active</string>
+    <string name="gps_start_error">GPS could not start. Check location settings.</string>
+    <string name="workout_live_stats">Live time, distance and pace are now connected.</string>
+
+    <!-- Workout Completed screen -->
+    <string name="workout_completed_title">Workout Completed</string>
+    <string name="workout_summary_activity">Activity: %1$s</string>
+    <string name="workout_summary_elapsed">Elapsed Time: %1$s</string>
+    <string name="workout_summary_distance">Distance: %1$s km</string>
+    <string name="workout_summary_pace">Average Pace: %1$s</string>
+    <string name="workout_summary_goal">Distance Goal: %1$s km</string>
+    <string name="workout_saved_message">Workout completed! Your activity has been saved to History.</string>
+    <string name="workout_new">New Workout</string>
+
 </resources>
