@@ -286,20 +286,26 @@ fun DashboardScreen() {
         }
 
         // Listen for activity lifecycle changes.
+
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
 
                 Lifecycle.Event.ON_START -> {
+                    // Resume GPS and the workout timer.
                     startTracking()
+                    workoutTimer.resume()
                 }
 
                 Lifecycle.Event.ON_STOP -> {
+                    // Pause GPS and the timer while in the background.
                     stopTracking()
+                    workoutTimer.pause()
                 }
 
                 else -> Unit
             }
         }
+
 
         lifecycleOwner.lifecycle.addObserver(observer)
 
