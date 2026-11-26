@@ -1,8 +1,13 @@
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
+
+
 
 android {
     namespace = "com.example.pacetrack"
@@ -38,7 +43,17 @@ android {
     }
 }
 
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
+}
+
+
 dependencies {
+    // Google Maps support for Jetpack Compose.
+    implementation("com.google.maps.android:maps-compose:6.10.0")
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

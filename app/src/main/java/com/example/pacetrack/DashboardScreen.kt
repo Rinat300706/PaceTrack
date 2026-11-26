@@ -1,6 +1,5 @@
 package com.example.pacetrack
 
-import android.R.attr.onClick
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,6 +39,37 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import android.app.ActivityOptions
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.provider.Settings
+import android.net.Uri
+import androidx.compose.runtime.DisposableEffect
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import androidx.compose.runtime.LaunchedEffect
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberUpdatedMarkerState
+import com.google.maps.android.compose.Polyline
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.google.maps.android.compose.MarkerComposable
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.size
 
 
 @Composable
@@ -149,11 +179,150 @@ fun DashboardScreen() {
 
     val context = LocalContext.current
 
+    val workoutStage = remember { mutableIntStateOf(0) }
+
+    // Store the latest GPS reading.
+    val latestGpsLocation = remember {
+        mutableStateOf<android.location.Location?>(null)
+    }
+    // Store the distance so the screen updates when GPS changes.
+    val distanceMeters = remember {
+        mutableStateOf(0f)
+    }
+
+    // Show an error if GPS cannot start.
+    val gpsError = remember {
+        mutableStateOf<String?>(null)
+    }
+
+    // Create one GPS tracker for this screen.
+
+    val locationTracker = remember(context) {
+        LocationTracker(context) { location, distance ->
+
+            latestGpsLocation.value = location
+            distanceMeters.value = distance
+        }
+    }
+
+
+    // Start GPS during a workout and stop it when leaving.
+
+    // Observe whether PaceTrack is in the foreground.
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Manage GPS when entering and leaving the workout.
+    DisposableEffect(
+        workoutStage.intValue,
+        locationTracker,
+        lifecycleOwner
+    ) {
+
+        val isWorkoutActive = workoutStage.intValue == 2
+        var gpsRunning = false
+
+        // Reset distance only for a new workout.
+        if (isWorkoutActive) {
+            locationTracker.resetDistance()
+            latestGpsLocation.value = null
+            distanceMeters.value = 0f
+        }
+
+        // Start GPS only when needed.
+        fun startTracking() {
+            if (isWorkoutActive && !gpsRunning) {
+                val started = locationTracker.start()
+                gpsRunning = started
+
+                gpsError.value = if (started) {
+                    null
+                } else {
+                    "GPS could not start. Check location settings."
+                }
+            }
+        }
+
+        // Stop GPS to avoid unnecessary tracking.
+        fun stopTracking() {
+            if (gpsRunning) {
+                locationTracker.stop()
+                gpsRunning = false
+            }
+        }
+
+        // Listen for activity lifecycle changes.
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+
+                Lifecycle.Event.ON_START -> {
+                    startTracking()
+                }
+
+                Lifecycle.Event.ON_STOP -> {
+                    stopTracking()
+                }
+
+                else -> Unit
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // Start even if the activity is already visible.
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(
+                Lifecycle.State.STARTED
+            )
+        ) {
+            startTracking()
+        }
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            stopTracking()
+        }
+    }
+
+
+    // Message shown if location permission is not granted.
+    val locationPermissionMessage = remember {
+        mutableStateOf<String?>(null)
+    }
+
+    // Requests location permissions from Android.
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+
+        val preciseGranted =
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+
+        val approximateGranted =
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+
+        when {
+            preciseGranted -> {
+                locationPermissionMessage.value = null
+                workoutStage.intValue = 2
+            }
+
+            approximateGranted -> {
+                locationPermissionMessage.value =
+                    "Precise location is needed for accurate workout distance. " +
+                            "Enable precise location for PaceTrack in your phone settings."
+            }
+
+            else -> {
+                locationPermissionMessage.value =
+                    "Location permission is required to track your workout distance."
+            }
+        }
+    }
+
+
     // 0 = Home
     // 1 = Workout Setup
     // 2 = Active Workout
     // 3 = Workout Completed
-    val workoutStage = remember { mutableIntStateOf(0) }
 
     val goal_enabled = remember { mutableStateOf(false) }
     val activity_options = listOf("Walk", "Run")
@@ -270,9 +439,27 @@ fun DashboardScreen() {
                     }
 
                     Button(
+
                         onClick = {
-                            workoutStage.intValue = 2
+                            val hasPreciseLocation =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                                ) == PackageManager.PERMISSION_GRANTED
+
+                            if (hasPreciseLocation) {
+                                locationPermissionMessage.value = null
+                                workoutStage.intValue = 2
+                            } else {
+                                locationPermissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                )
+                            }
                         },
+
                         enabled = validGoal,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -280,6 +467,34 @@ fun DashboardScreen() {
                     ) {
                         Text("Begin ${activity_options[selected_activity.value]}")
                     }
+
+
+                    if (locationPermissionMessage.value != null) {
+
+                        Text(
+                            text = locationPermissionMessage.value ?: ""
+                        )
+
+                        OutlinedButton(
+                            onClick = {
+                                val intent = Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                ).apply {
+                                    data = Uri.fromParts(
+                                        "package",
+                                        context.packageName,
+                                        null
+                                    )
+                                }
+
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Open Location Settings")
+                        }
+                    }
+
 
                     OutlinedButton(
                         onClick = {
@@ -294,83 +509,305 @@ fun DashboardScreen() {
 
             // SCREEN 3: Active workout
             2 -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+
+                // Read the direction the phone is facing.
+                val phoneHeading = rememberPhoneHeading()
+
+                // Set an initial location for testing the map.
+                val cameraPositionState = rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(
+                        LatLng(53.3498, -6.2603),
+                        14f
+                    )
+                }
+
+                // Remember whether Google Maps has finished loading.
+                val mapLoaded = remember { mutableStateOf(false) }
+
+                // Follow the latest GPS location during the workout.
+                LaunchedEffect(mapLoaded.value, latestGpsLocation.value) {
+
+                    val location = latestGpsLocation.value
+
+                    if (mapLoaded.value && location != null) {
+
+                        val currentPosition = LatLng(
+                            location.latitude,
+                            location.longitude
+                        )
+
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(
+                                currentPosition,
+                                17f
+                            ),
+                            durationMs = 700
+                        )
+                    }
+                }
+
+                // Allow the map and workout controls to overlap.
+                Box(
+                    modifier = Modifier.fillMaxSize()
                 ) {
 
-                    Text(
-                        text = "${activity_options[selected_activity.value]} Session",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 26.sp
-                    )
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState,
+                        uiSettings = MapUiSettings(
+                            zoomControlsEnabled = false
+                        ),
+                        onMapLoaded = {
+                            mapLoaded.value = true
+                        }
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
 
-                            Text("Elapsed Time")
 
-                            Text(
-                                text = "--:--:--",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 32.sp
+                    // Display the current GPS location.
+                        latestGpsLocation.value?.let { location ->
+
+                            val currentPosition = LatLng(
+                                location.latitude,
+                                location.longitude
                             )
 
-                            HorizontalDivider()
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                            MarkerComposable(
+                                state = rememberUpdatedMarkerState(
+                                    position = currentPosition
+                                ),
+                                anchor = Offset(0.5f, 0.5f),
+                                flat = true,
+                                rotation = phoneHeading,
+                                title = "Current Location",
+                                contentDescription = "Current location arrow"
                             ) {
-                                Column {
-                                    Text("Distance")
+                                // White circular background for better map visibility.
+                                Box(
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .background(Color.White, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    // Blue navigation arrow.
                                     Text(
-                                        "-- km",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 20.sp
-                                    )
-                                }
-
-                                Column {
-                                    Text("Average Pace")
-                                    Text(
-                                        "-- /km",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 20.sp
+                                        text = "▲",
+                                        color = Color(0xFF1565C0),
+                                        fontSize = 30.sp,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                             }
 
-                            if (goal_enabled.value && validGoal) {
-                                HorizontalDivider()
-                                Text("Distance Goal")
-                                Text("${goal_distance.value} km")
+
+                            // Convert GPS route points into map coordinates.
+                            val routeCoordinates =
+                                locationTracker.getRoutePoints().map { point ->
+                                    LatLng(
+                                        point.latitude,
+                                        point.longitude
+                                    )
+                                }
+
+                            // Draw the route as a blue line.
+                            if (routeCoordinates.size >= 2) {
+                                Polyline(
+                                    points = routeCoordinates,
+                                    color = Color(0xFF1565C0),
+                                    width = 12f
+                                )
                             }
                         }
                     }
 
-                    Text("Preview only: Real timer and GPS tracking are not connected yet.")
 
-                    Button(
-                        onClick = {
-                            workoutStage.intValue = 3
-                        },
+
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text("Finish Preview")
+
+                        Text(
+                            text = "${activity_options[selected_activity.value]} Session",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 26.sp
+                        )
+
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 6.dp
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+
+
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+
+                                    // Workout time
+                                    Column(
+                                        modifier = Modifier.weight(1f),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "TIME",
+                                            fontSize = 12.sp,
+                                            color = Color.DarkGray
+                                        )
+
+                                        Text(
+                                            text = "--:--:--",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            color = Color(0xFF17324D)
+                                        )
+                                    }
+
+                                    // GPS distance
+                                    Column(
+                                        modifier = Modifier.weight(1f),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "DISTANCE",
+                                            fontSize = 12.sp,
+                                            color = Color.DarkGray
+                                        )
+
+                                        Text(
+                                            text = "%.2f km".format(distanceMeters.value / 1000f),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            color = Color(0xFF17324D)
+                                        )
+                                    }
+
+                                    // Average pace
+                                    Column(
+                                        modifier = Modifier.weight(1f),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "PACE",
+                                            fontSize = 12.sp,
+                                            color = Color.DarkGray
+                                        )
+
+                                        Text(
+                                            text = "-- /km",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            color = Color(0xFF17324D)
+                                        )
+                                    }
+                                }
+
+
+                                if (goal_enabled.value && validGoal) {
+                                    HorizontalDivider()
+                                    Text("Distance Goal")
+                                    Text("${goal_distance.value} km")
+                                }
+                            }
+                        }
+
+
+
+
+
+
+
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 4.dp
+                            )
+                        ) {
+
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+
+                                // Show the current GPS tracking status.
+                                Text(
+                                    text = when {
+                                        gpsError.value != null ->
+                                            gpsError.value ?: ""
+
+                                        latestGpsLocation.value == null ->
+                                            "GPS: Waiting for location..."
+
+                                        else ->
+                                            "GPS: Tracking active"
+                                    },
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                    color = if (gpsError.value != null) {
+                                        Color(0xFFB91C1C)
+                                    } else {
+                                        Color(0xFF17324D)
+                                    }
+                                )
+
+                                // Explain which statistics are unfinished.
+                                Text(
+                                    text = "Time and pace aren't connected yet.",
+                                    fontSize = 12.sp,
+                                    color = Color.DarkGray
+                                )
+                            }
+                        }
+
+
+                        // Push the Finish button to the bottom of the screen.
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Button(
+                            onClick = {
+                                workoutStage.intValue = 3
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF17324D),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                text = "Finish Preview",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
                     }
                 }
             }
+
+
+
 
             // SCREEN 4: Workout completed
             3 -> {
@@ -400,7 +837,11 @@ fun DashboardScreen() {
 
                             Text("Elapsed Time: --:--:--")
 
-                            Text("Distance: -- km")
+
+                            Text(
+                                text = "Distance: %.2f km".format(distanceMeters.value / 1000f)
+                            )
+
 
                             Text("Average Pace: -- /km")
 
@@ -410,9 +851,12 @@ fun DashboardScreen() {
                         }
                     }
 
+
                     Text(
-                        "This was an interface preview. No workout has been recorded or saved."
+                        "Your GPS distance was tracked during this workout. " +
+                                "The session has not been saved to History yet."
                     )
+
 
                     Button(
                         onClick = {
