@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
 
 
 fun formatDistance(metres: Double): String {
@@ -80,13 +81,27 @@ fun HistoryCard(
                     .padding(top = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                HistoryStat("Distance", distance)
-                HistoryStat("Time", time)
-                HistoryStat("Pace", pace)
+
+                HistoryStat(
+                    stringResource(R.string.history_distance),
+                    distance
+                )
+
+                HistoryStat(
+                    stringResource(R.string.history_time),
+                    time
+                )
+
+                HistoryStat(
+                    stringResource(R.string.history_pace),
+                    pace
+                )
+
             }
         }
     }
 }
+
 
 @Composable
 fun EmptyHistoryMessage() {
@@ -97,18 +112,19 @@ fun EmptyHistoryMessage() {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "No activities recorded yet",
+                text = stringResource(R.string.history_empty_title),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
 
             Text(
-                text = "Complete your first walk or run to see it here.",
+                text = stringResource(R.string.history_empty_message),
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
 }
+
 
 @Composable
 fun HistoryScreen(viewModel: WorkoutViewModel = viewModel()) {
@@ -126,19 +142,28 @@ fun HistoryScreen(viewModel: WorkoutViewModel = viewModel()) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Activity History",
+                text = stringResource(R.string.history_title),
                 fontWeight = FontWeight.Bold,
                 fontSize = 26.sp
             )
 
-            Text("Review your previous walks and runs")
+            Text(stringResource(R.string.history_subtitle))
 
             val filter_options = listOf("All", "Walk", "Run")
             val selected_filter = remember { mutableIntStateOf(0) }
 
-            RadioButtonGroup(filter_options, selected_filter.intValue) {
+
+            RadioButtonGroup(
+                radio_options = listOf(
+                    stringResource(R.string.history_all),
+                    stringResource(R.string.history_walk),
+                    stringResource(R.string.history_run)
+                ),
+                selected = selected_filter.intValue
+            ) {
                 selected_filter.intValue = it
             }
+
 
             val shown_workouts =
                 if (selected_filter.intValue == 0) workouts
@@ -147,15 +172,25 @@ fun HistoryScreen(viewModel: WorkoutViewModel = viewModel()) {
             if (shown_workouts.isEmpty()) {
                 EmptyHistoryMessage()
             } else {
+
                 for (workout in shown_workouts) {
+
+                    // Translate the activity name for display only.
+                    val activityLabel = when (workout.activityType) {
+                        "Walk" -> stringResource(R.string.history_walk)
+                        "Run" -> stringResource(R.string.history_run)
+                        else -> workout.activityType
+                    }
+
                     HistoryCard(
-                        title = "${workout.activityType} - ${formatDate(workout.startTime)}",
+                        title = "$activityLabel - ${formatDate(workout.startTime)}",
                         distance = formatDistance(workout.distanceMetres),
                         time = formatElapsedTime(workout.durationMillis),
                         pace = formatPace(workout.averagePaceSecondsPerKm)
                     )
                 }
+
+            }
             }
         }
     }
-}

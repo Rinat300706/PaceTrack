@@ -16,8 +16,18 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import android.content.Context
+import androidx.compose.ui.res.stringResource
 
 class HistoryActivity : ComponentActivity() {
+
+    // Apply the language selected in Settings.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(
+            PaceTrackLanguage.apply(newBase)
+        )
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +67,7 @@ class HistoryActivity : ComponentActivity() {
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        Text("Back to Home")
+                        Text(stringResource(R.string.settings_back_home))
                     }
                 }
             }

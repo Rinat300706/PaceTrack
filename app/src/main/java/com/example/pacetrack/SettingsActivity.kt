@@ -15,8 +15,17 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import android.content.Context
 
 class SettingsActivity : ComponentActivity() {
+
+    // Apply the user's selected language to Settings.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(
+            PaceTrackLanguage.apply(newBase)
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +42,13 @@ class SettingsActivity : ComponentActivity() {
             val appearanceMode = remember {
                 mutableStateOf(
                     preferences.getString("appearance_mode", "System") ?: "System"
+                )
+            }
+
+            // Remember the user's language selection.
+            val languageCode = remember {
+                mutableStateOf(
+                    preferences.getString("language_code", "en") ?: "en"
                 )
             }
 
@@ -56,7 +72,7 @@ class SettingsActivity : ComponentActivity() {
 
                     // Settings screen heading.
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings_title),
                         fontSize = 26.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -66,7 +82,7 @@ class SettingsActivity : ComponentActivity() {
 
                     // Appearance settings.
                     Text(
-                        text = "Appearance",
+                        text = stringResource(R.string.settings_appearance),
                         fontWeight = FontWeight.Bold
                     )
 
@@ -87,19 +103,59 @@ class SettingsActivity : ComponentActivity() {
                                 }
                             )
 
-                            Text(option)
+
+                            Text(
+                                text = when (option) {
+                                    "System" -> stringResource(R.string.theme_system)
+                                    "Light" -> stringResource(R.string.theme_light)
+                                    "Dark" -> stringResource(R.string.theme_dark)
+                                    else -> option
+                                }
+                            )
+
                         }
                     }
 
 
                     // Language settings.
-                    Text("Language")
+                    Text(
+                        text = stringResource(R.string.settings_language),
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    listOf(
+                        "en" to R.string.language_english,
+                        "ga" to R.string.language_irish
+                    ).forEach { (code, label) ->
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = languageCode.value == code,
+                                onClick = {
+                                    // Remember the selected language.
+                                    languageCode.value = code
+
+                                    // Save it on the phone.
+                                    preferences.edit()
+                                        .putString("language_code", code)
+                                        .apply()
+
+                                    recreate()
+                                }
+                            )
+
+                            Text(stringResource(label))
+                        }
+                    }
+
 
                     // Accessibility settings.
-                    Text("Accessibility")
+                    Text(stringResource(R.string.settings_accessibility))
 
                     // App information.
-                    Text("About PaceTrack")
+                    Text(stringResource(R.string.settings_about))
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -110,7 +166,7 @@ class SettingsActivity : ComponentActivity() {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Back to Home")
+                        Text(stringResource(R.string.settings_back_home))
                     }
                 }
             }
