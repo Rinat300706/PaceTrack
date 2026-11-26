@@ -19,7 +19,22 @@ import androidx.compose.material3.Card
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableIntStateOf
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
+fun formatDistance(metres: Double): String {
+    return String.format(Locale.ROOT, "%.2f km", metres / 1000)
+}
+
+fun formatPace(secondsPerKm: Long?): String {
+    if (secondsPerKm == null) return "--"
+    return String.format(Locale.ROOT, "%d:%02d /km", secondsPerKm / 60, secondsPerKm % 60)
+}
+
+fun formatDate(millis: Long): String {
+    return SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault()).format(Date(millis))
+}
 data class HistorySession(
     val title: String,
     val type: String,
