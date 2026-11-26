@@ -70,7 +70,29 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.mutableLongStateOf
+import kotlinx.coroutines.delay
 
+
+fun calculateAveragePaceSecondsPerKm(
+    elapsedMillis: Long,
+    distanceMeters: Float
+): Long? {
+
+    // Wait until at least 20 metres have been recorded.
+    if (elapsedMillis <= 0L || distanceMeters < 20f) {
+        return null
+    }
+
+    // Convert the elapsed time into seconds.
+    val elapsedSeconds = elapsedMillis / 1000.0
+
+    // Convert GPS distance into kilometres.
+    val distanceKm = distanceMeters / 1000.0
+
+    // Calculate how many seconds one kilometre takes.
+    return (elapsedSeconds / distanceKm).toLong()
+}
 
 @Composable
 fun WelcomeMessage() {
@@ -181,6 +203,12 @@ fun DashboardScreen() {
 
     val workoutStage = remember { mutableIntStateOf(0) }
 
+    // Use Liam's workout timer.
+    val workoutTimer = remember { WorkoutTimer() }
+
+    // Store the elapsed time for displaying on screen.
+    val elapsedMillis = remember { mutableLongStateOf(0L) }
+
     // Store the latest GPS reading.
     val latestGpsLocation = remember {
         mutableStateOf<android.location.Location?>(null)
@@ -279,6 +307,33 @@ fun DashboardScreen() {
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
             stopTracking()
+        }
+    }
+
+
+    // Keep the workout timer connected to the workout stage.
+    LaunchedEffect(workoutStage.intValue) {
+
+        when (workoutStage.intValue) {
+
+            2 -> {
+                // Start a new timer when the workout begins.
+                workoutTimer.start()
+                elapsedMillis.longValue = 0L
+
+                // Update the displayed time while working out.
+                while (true) {
+                    elapsedMillis.longValue =
+                        workoutTimer.getElapsedTime()
+
+                    delay(250L)
+                }
+            }
+
+            3 -> {
+                // Stop the timer and save its final duration.
+                elapsedMillis.longValue = workoutTimer.finish()
+            }
         }
     }
 
@@ -672,7 +727,7 @@ fun DashboardScreen() {
                                         )
 
                                         Text(
-                                            text = "--:--:--",
+                                            text = formatElapsedTime(elapsedMillis.longValue),
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 18.sp,
                                             color = Color(0xFF17324D)
@@ -709,12 +764,19 @@ fun DashboardScreen() {
                                             color = Color.DarkGray
                                         )
 
+
                                         Text(
-                                            text = "-- /km",
+                                            text = formatPace(
+                                                calculateAveragePaceSecondsPerKm(
+                                                    elapsedMillis.longValue,
+                                                    distanceMeters.value
+                                                )
+                                            ),
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 18.sp,
                                             color = Color(0xFF17324D)
                                         )
+
                                     }
                                 }
 
@@ -773,7 +835,7 @@ fun DashboardScreen() {
 
                                 // Explain which statistics are unfinished.
                                 Text(
-                                    text = "Time and pace aren't connected yet.",
+                                    text = "Live time, distance and pace are now connected.",
                                     fontSize = 12.sp,
                                     color = Color.DarkGray
                                 )
@@ -835,7 +897,9 @@ fun DashboardScreen() {
 
                             Text("Activity: ${activity_options[selected_activity.value]}")
 
-                            Text("Elapsed Time: --:--:--")
+                            Text(
+                                text = "Elapsed Time: ${formatElapsedTime(elapsedMillis.longValue)}"
+                            )
 
 
                             Text(
@@ -843,7 +907,15 @@ fun DashboardScreen() {
                             )
 
 
-                            Text("Average Pace: -- /km")
+                            Text(
+                                text = "Average Pace: " + formatPace(
+                                    calculateAveragePaceSecondsPerKm(
+                                        elapsedMillis.longValue,
+                                        distanceMeters.value
+                                    )
+                                )
+                            )
+
 
                             if (goal_enabled.value && validGoal) {
                                 Text("Distance Goal: ${goal_distance.value} km")
